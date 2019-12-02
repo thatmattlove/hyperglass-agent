@@ -1,4 +1,4 @@
-from hyperglass_agent.models._utils import HyperglassModel
+from models._utils import HyperglassModel
 
 
 class Command(HyperglassModel):
@@ -147,3 +147,6 @@ class Commands(HyperglassModel):
         ipv6_default: IPv6 = IPv6()
         ipv4_vpn: VPNIPv4 = VPNIPv4()
         ipv6_vpn: VPNIPv6 = VPNIPv6()
+
+    bird: BIRD = BIRD()
+    frr: FRR = FRR()

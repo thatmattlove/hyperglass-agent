@@ -1,16 +1,16 @@
 class HyperglassAgentError(Exception):
     """Base exception class for all hyperglass-agent errors"""
 
-    def __init__(self, message="", alert="warning", keywords=[]):
+    def __init__(self, message="", code=500, keywords=[]):
         self.message = message
-        self.alert = alert
+        self.code = code
         self.keywords = keywords
 
     def __str__(self):
         return self.message
 
     def __dict__(self):
-        return {"message": self.message, "alert": self.alert, "keywords": self.keywords}
+        return {"message": self.message, "code": self.code, "keywords": self.keywords}
 
 
 class ConfigError(HyperglassAgentError):
@@ -31,3 +31,17 @@ class ConfigInvalid(HyperglassAgentError):
         )
         self.keywords = [value for value in kwargs.values()]
         super().__init__(message=self.message, keywords=self.keywords)
+
+
+class QueryError(HyperglassAgentError):
+    def __init__(self, unformatted_msg, **kwargs):
+        self.message = unformatted_msg.format(**kwargs)
+        self.code = 400
+        super().__init__(message=self.message, code=self.code)
+
+
+class ExecutionError(HyperglassAgentError):
+    def __init__(self, unformatted_msg, **kwargs):
+        self.message = unformatted_msg.format(**kwargs)
+        self.code = 500
+        super().__init__(message=self.message, code=self.code)

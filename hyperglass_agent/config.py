@@ -1,11 +1,13 @@
 from pathlib import Path
 import yaml
 from pydantic import ValidationError
-from hyperglass_agent.exceptions import ConfigError, ConfigInvalid
-from hyperglass_agent.models.commands import Commands
-from hyperglass_agent.models.general import General
+from exceptions import ConfigError, ConfigInvalid
+from models.commands import Commands
+from models.general import General
 
-CONFIG_FILE = Path().cwd() / "config.yaml"
+WORKING_DIR = Path(__file__).resolve().parent
+
+CONFIG_FILE = WORKING_DIR / "config.yaml"
 
 try:
     with CONFIG_FILE.open("r") as config_file:
@@ -18,10 +20,12 @@ except (yaml.YAMLError, yaml.MarkedYAMLError) as yaml_error:
     raise ConfigError(yaml_error) from None
 
 try:
-    raw_config_commands = {"commands": raw_config.pop("commands", None)}
+    raw_config_commands = raw_config.pop("commands", None)
     user_config = General(**raw_config)
     if raw_config_commands is not None:
         user_commands = Commands.import_params(**raw_config_commands)
+    else:
+        user_commands = Commands()
 except ValidationError as validation_errors:
     errors = validation_errors.errors()
     for error in errors:

@@ -1,8 +1,9 @@
 debug: true
 listen_address: "0.0.0.0"
 port: 8080
-mode: "frr" # frr|bird
-
+mode: frr # frr|bird
+# secret: dont4get
+secret: TestSecret12345
 # commands:
 #   frr:
 #     ipv4_default:
