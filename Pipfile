@@ -5,17 +5,22 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
-black = "*"
-stackprinter = "*"
-httpx = "*"
+black = "==19.3b0"
+isort = "*"
 
 [packages]
-fastapi = "*"
 pyyaml = "*"
-uvicorn = "*"
-isort = "*"
 logzero = "*"
 authlib = "*"
+cryptography = "*"
+pyjwt = "*"
+responder = "*"
+httpx = "*"
+pydantic = "*"
+stackprinter = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3"
+
+[pipenv]
+allow_prereleases = true

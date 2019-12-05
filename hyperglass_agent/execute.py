@@ -1,9 +1,15 @@
-import operator
-from logzero import logger as log
-from config import params
-from config import commands
-from exceptions import QueryError, ExecutionError
+# Standard Library Imports
 import asyncio
+import operator
+from hyperglass_agent.exceptions import ExecutionError
+from hyperglass_agent.exceptions import QueryError
+
+# Third Party Imports
+from logzero import logger as log
+
+# Project Imports
+from hyperglass_agent.config import commands
+from hyperglass_agent.config import params
 
 
 async def run_query(query):

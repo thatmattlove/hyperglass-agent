@@ -1,20 +1,20 @@
-from fastapi import FastAPI
+# Standard Library Imports
 import json
-import uvicorn
-from logzero import logger as log
+
+# Third Party Imports
+import responder
 from authlib.jose import JWS
 from authlib.jose import JWS_ALGORITHMS
-
-import stackprinter
-
-from config import params
-from models.request import Request
-from execute import run_query
-from exceptions import HyperglassAgentError, QueryError
-from fastapi.exceptions import RequestValidationError
+from logzero import logger as log
 from pydantic import ValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.responses import JSONResponse
+
+# Project Imports
+import stackprinter
+from hyperglass_agent.config import params
+from hyperglass_agent.exceptions import HyperglassAgentError
+from hyperglass_agent.exceptions import QueryError
+from hyperglass_agent.execute import run_query
+from hyperglass_agent.models.request import Request
 
 stackprinter.set_excepthook()
 
@@ -22,7 +22,7 @@ LOG_LEVEL = "info"
 if params.debug:
     LOG_LEVEL = "debug"
 
-app = FastAPI()
+api = responder.API()
 
 jws = JWS(algorithms=JWS_ALGORITHMS)
 
@@ -39,40 +39,26 @@ async def decrypted_data(data):
         )  # TODO: Tighten this up
 
 
-@app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(request, exc):
-    return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
-
-
-@app.exception_handler(RequestValidationError)
-async def http_exception_handler(request, exc):
-    return JSONResponse(status_code=400, content={"error": str(exc)})
-
-
-@app.exception_handler(ValidationError)
-async def http_exception_handler(request, exc):
-    return JSONResponse(status_code=400, content={"error": str(exc)})
-
-
-@app.exception_handler(HyperglassAgentError)
-async def http_exception_handler(request, exc):
-    return JSONResponse(status_code=exc.code, content={"error": exc.message})
-
-
-@app.get("/query/{request}")
-async def query_entrypoint(request):
-    decrypted_query = await decrypted_data(request)
-    log.debug(decrypted_query)
-    validated_query = Request(**decrypted_query)
-    query_output = await run_query(validated_query)
-    return query_output
+@api.route("/query/{params}")
+async def query_entrypoint(req, resp, params):
+    try:
+        decrypted_query = await decrypted_data(params)
+        log.debug(decrypted_query)
+        validated_query = Request(**decrypted_query)
+        query_output = await run_query(validated_query)
+        resp.media = query_output
+    except ValidationError as err_validation:
+        resp.status_code = 400
+        resp.media = {"error": str(err_validation)}
+    except HyperglassAgentError as err_agent:
+        resp.status_code = err_agent.code
+        resp.media = {"error": str(err_agent)}
 
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "agent:app",
-        host=params.listen_address.compressed,
+    api.run(
+        address=params.listen_address.compressed,
         port=params.port,
         log_level=LOG_LEVEL,
-        reload=params.debug,
+        debug=params.debug,
     )

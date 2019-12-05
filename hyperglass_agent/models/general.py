@@ -1,9 +1,15 @@
+# Standard Library Imports
 import ipaddress
 from typing import Union
-from pydantic import validator, SecretStr
-from exceptions import ConfigError
-from constants import SUPPORTED_NOS
-from models._utils import HyperglassModel
+
+# Third Party Imports
+from pydantic import SecretStr
+from pydantic import validator
+
+# Project Imports
+from hyperglass_agent.constants import SUPPORTED_NOS
+from hyperglass_agent.exceptions import ConfigError
+from hyperglass_agent.models._utils import HyperglassModel
 
 
 class General(HyperglassModel):

@@ -1,9 +1,14 @@
-from pydantic import BaseModel
-from pydantic import validator
+# Standard Library Imports
 import ipaddress
 from typing import Union
-from constants import SUPPORTED_QUERY
-from exceptions import QueryError
+
+# Third Party Imports
+from pydantic import BaseModel
+from pydantic import validator
+
+# Project Imports
+from hyperglass_agent.constants import SUPPORTED_QUERY
+from hyperglass_agent.exceptions import QueryError
 
 
 class Request(BaseModel):

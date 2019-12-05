@@ -1,4 +1,5 @@
-from models._utils import HyperglassModel
+# Project Imports
+from hyperglass_agent.models._utils import HyperglassModel
 
 
 class Command(HyperglassModel):

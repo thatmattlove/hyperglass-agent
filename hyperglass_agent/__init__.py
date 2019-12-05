@@ -1,8 +1,14 @@
 # flake8: noqa: F401
-from hyperglass_agent import config
-from hyperglass_agent import models
+# Project Imports
 from hyperglass_agent import agent
+from hyperglass_agent import config
 from hyperglass_agent import constants
 from hyperglass_agent import exceptions
+from hyperglass_agent import models
 
 __name__ == "hyperglass_agent"
+
+# Stackprinter Configuration
+import stackprinter
+
+stackprinter.set_excepthook()
