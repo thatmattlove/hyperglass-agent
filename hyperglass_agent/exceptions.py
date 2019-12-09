@@ -45,3 +45,10 @@ class ExecutionError(HyperglassAgentError):
         self.message = unformatted_msg.format(**kwargs)
         self.code = 500
         super().__init__(message=self.message, code=self.code)
+
+
+class SecurityError(HyperglassAgentError):
+    def __init__(self, unformatted_msg, **kwargs):
+        self.message = unformatted_msg.format(**kwargs)
+        self.code = 500
+        super().__init__(message=self.message, code=self.code)

@@ -11,13 +11,13 @@ isort = "*"
 [packages]
 pyyaml = "*"
 logzero = "*"
-authlib = "*"
 cryptography = "*"
 pyjwt = "*"
 responder = "*"
-httpx = "*"
+httpx = "==0.9.*"
 pydantic = "*"
 stackprinter = "*"
+click = "*"
 
 [requires]
 python_version = "3"

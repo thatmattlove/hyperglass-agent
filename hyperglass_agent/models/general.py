@@ -18,6 +18,7 @@ class General(HyperglassModel):
     port: int = 8080
     mode: str
     secret: SecretStr
+    valid_duration: int = 60
 
     @validator("mode")
     def validate_mode(cls, value):
