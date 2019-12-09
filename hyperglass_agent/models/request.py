@@ -1,6 +1,7 @@
 # Standard Library Imports
 import ipaddress
 from typing import Union
+from typing import Optional
 
 # Third Party Imports
 from pydantic import BaseModel
@@ -15,7 +16,7 @@ class Request(BaseModel):
     query_type: str
     vrf: str
     afi: str
-    source: Union[ipaddress.IPv4Address, ipaddress.IPv6Address]
+    source: Optional[Union[ipaddress.IPv4Address, ipaddress.IPv6Address]]
     target: str
 
     @validator("query_type")
