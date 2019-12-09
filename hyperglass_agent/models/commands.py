@@ -67,36 +67,36 @@ class Commands(HyperglassModel):
         class VPNIPv4(Command.VPNIPv4):
             """Default commands for dual afi commands"""
 
-            bgp_community: str = "show bgp vrf {vrf} ipv4 unicast community {target}"
-            bgp_aspath: str = "show bgp vrf {vrf} ipv4 unicast regexp {target}"
-            bgp_route: str = "show bgp vrf {vrf} ipv4 unicast {target}"
+            bgp_community: str = 'vtysh -c "show bgp vrf {vrf} ipv4 unicast community {target}"'
+            bgp_aspath: str = 'vtysh -c "show bgp vrf {vrf} ipv4 unicast regexp {target}"'
+            bgp_route: str = 'vtysh -c "show bgp vrf {vrf} ipv4 unicast {target}"'
             ping: str = "ping -4 -c 5 -I {source} {target}"
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
         class VPNIPv6(Command.VPNIPv6):
             """Default commands for dual afi commands"""
 
-            bgp_community: str = "show bgp vrf {vrf} ipv6 unicast community {target}"
-            bgp_aspath: str = "show bgp vrf {vrf} ipv6 unicast regexp {target}"
-            bgp_route: str = "show bgp vrf {vrf} ipv6 unicast {target}"
+            bgp_community: str = 'vtysh -c "show bgp vrf {vrf} ipv6 unicast community {target}"'
+            bgp_aspath: str = 'vtysh -c "show bgp vrf {vrf} ipv6 unicast regexp {target}"'
+            bgp_route: str = 'vtysh -c "show bgp vrf {vrf} ipv6 unicast {target}"'
             ping: str = "ping -6 -c 5 -I {source} {target}"
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
         class IPv4(Command.IPv4):
             """Default commands for ipv4 commands"""
 
-            bgp_community: str = "show bgp ipv4 unicast community {target}"
-            bgp_aspath: str = "show bgp ipv4 unicast regexp {target}"
-            bgp_route: str = "show bgp ipv4 unicast {target}"
+            bgp_community: str = 'vtysh -c "show bgp ipv4 unicast community {target}"'
+            bgp_aspath: str = 'vtysh -c "show bgp ipv4 unicast regexp {target}"'
+            bgp_route: str = 'vtysh -c "show bgp ipv4 unicast {target}"'
             ping: str = "ping -4 -c 5 -I {source} {target}"
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
         class IPv6(Command.IPv6):
             """Default commands for ipv6 commands"""
 
-            bgp_community: str = "show bgp ipv6 unicast community {target}"
-            bgp_aspath: str = "show bgp ipv6 unicast regexp {target}"
-            bgp_route: str = "show bgp ipv6 unicast {target}"
+            bgp_community: str = 'vtysh -c "show bgp ipv6 unicast community {target}"'
+            bgp_aspath: str = 'vtysh -c "show bgp ipv6 unicast regexp {target}"'
+            bgp_route: str = 'vtysh -c "show bgp ipv6 unicast {target}"'
             ping: str = "ping -6 -c 5 -I {source} {target}"
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
