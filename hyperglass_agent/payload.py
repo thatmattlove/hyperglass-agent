@@ -1,22 +1,10 @@
 import jwt
 import datetime
-import asyncio
-from functools import update_wrapper
 from hyperglass_agent.config import params
 from hyperglass_agent.exceptions import SecurityError
 
 
-def sync_compatible(func):
-    func = asyncio.coroutine(func)
-
-    def wrapper(*args, **kwargs):
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(func(*args, **kwargs))
-
-    return update_wrapper(wrapper, func)
-
-
-async def decode(payload):
+async def jwt_decode(payload):
     try:
         decoded = jwt.decode(
             payload, params.secret.get_secret_value(), algorithm="HS256"
@@ -27,7 +15,7 @@ async def decode(payload):
         raise SecurityError(str(exp)) from None
 
 
-async def encode(response):
+async def jwt_encode(response):
     payload = {
         "payload": response,
         "nbf": datetime.datetime.utcnow(),
@@ -36,4 +24,4 @@ async def encode(response):
         + datetime.timedelta(seconds=params.valid_duration),
     }
     encoded = jwt.encode(payload, params.secret.get_secret_value(), algorithm="HS256")
-    return encoded
+    return encoded.decode("utf-8")
