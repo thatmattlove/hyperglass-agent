@@ -23,5 +23,7 @@ async def jwt_encode(response):
         "exp": datetime.datetime.utcnow()
         + datetime.timedelta(seconds=params.valid_duration),
     }
-    encoded = jwt.encode(payload, params.secret.get_secret_value(), algorithm="HS256")
-    return encoded.decode("utf-8")
+    encoded = jwt.encode(
+        payload, params.secret.get_secret_value(), algorithm="HS256"
+    ).decode("utf-8")
+    return encoded

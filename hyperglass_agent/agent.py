@@ -41,13 +41,19 @@ async def query_entrypoint(req, resp):
 
         validated_query = Request(**decrypted_query)
         query_output = await run_query(validated_query)
-        resp.media = await jwt_encode(query_output)
+
+        log.debug(f"Query Output:\n{query_output}")
+
+        encoded = await jwt_encode(query_output)
+        resp.media = {"encoded": encoded}
 
     except ValidationError as err_validation:
+        log.error(str(err_validation))
         resp.status_code = 400
         resp.media = {"error": str(err_validation)}
 
     except HyperglassAgentError as err_agent:
+        log.error(str(err_agent))
         resp.status_code = err_agent.code
         resp.media = {"error": str(err_agent)}
 
