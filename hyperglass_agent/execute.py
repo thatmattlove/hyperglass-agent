@@ -17,7 +17,13 @@ async def run_query(query):
     command_raw = operator.attrgetter(
         ".".join([params.mode, query.afi, query.query_type])
     )(commands)
+
+    log.debug(f"Raw Command: {command_raw}")
+
     command = command_raw.format(**query.dict())
+
+    log.debug(f"Formatted Command: {command}")
+
     proc = await asyncio.create_subprocess_shell(
         command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )

@@ -1,4 +1,5 @@
 # Standard Library Imports
+import json
 from pathlib import Path
 
 # Third Party Imports
@@ -32,6 +33,7 @@ async def query_entrypoint(req, resp):
         query = await req.media()
         query_str = query["encoded"]
         decrypted_query = await decode(query_str)
+        decrypted_query = json.loads(decrypted_query)
 
         log.debug(decrypted_query)
 
