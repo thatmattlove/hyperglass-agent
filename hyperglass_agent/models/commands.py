@@ -162,6 +162,12 @@ class Commands(HyperglassModel):
             ping: str = "ping -6 -c 5 -I {source} {target}"
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
+            @validator(*AGENT_QUERY, allow_reuse=True)
+            def prefix_bird(cls, value):
+                if "birdc" not in value:
+                    value = format_bird(BIRD_VERSION, 6, value)
+                return value
+
         class IPv4(Command.IPv4):
             """Default commands for ipv4 commands"""
 
@@ -171,6 +177,12 @@ class Commands(HyperglassModel):
             ping: str = "ping -4 -c 5 -I {source} {target}"
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
+            @validator(*AGENT_QUERY, allow_reuse=True)
+            def prefix_bird(cls, value):
+                if "birdc" not in value:
+                    value = format_bird(BIRD_VERSION, 4, value)
+                return value
+
         class IPv6(Command.IPv6):
             """Default commands for ipv6 commands"""
 
@@ -179,6 +191,12 @@ class Commands(HyperglassModel):
             bgp_route: str = "show route all where {target} ~ net"
             ping: str = "ping -6 -c 5 -I {source} {target}"
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
+
+            @validator(*AGENT_QUERY, allow_reuse=True)
+            def prefix_bird(cls, value):
+                if "birdc" not in value:
+                    value = format_bird(BIRD_VERSION, 6, value)
+                return value
 
         ipv4_default: IPv4 = IPv4()
         ipv6_default: IPv6 = IPv6()

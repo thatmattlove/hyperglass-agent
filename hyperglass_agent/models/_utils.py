@@ -31,4 +31,3 @@ class HyperglassModel(pydantic.BaseSettings):
         validate_all = True
         extra = "forbid"
         validate_assignment = True
-        alias_generator = clean_name
