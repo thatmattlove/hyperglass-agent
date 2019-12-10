@@ -3,9 +3,7 @@ from pydantic import validator
 from hyperglass_agent.constants import AGENT_QUERY
 from hyperglass_agent.models._utils import HyperglassModel
 from hyperglass_agent.models._formatters import format_bird, format_frr
-from hyperglass_agent.nos_utils.bird import get_bird_version
-
-BIRD_VERSION = get_bird_version()
+from hyperglass_agent.nos_utils.bird import BIRD_VERSION
 
 
 class Command(HyperglassModel):

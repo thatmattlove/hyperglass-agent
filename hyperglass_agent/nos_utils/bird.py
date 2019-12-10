@@ -46,3 +46,6 @@ async def parse_bird_output(raw, query_data, not_found):
         output = raw_joined
     log.debug(f"Parsed output:\n{output}")
     return output
+
+
+BIRD_VERSION = get_bird_version()
