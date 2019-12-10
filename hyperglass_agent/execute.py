@@ -12,12 +12,12 @@ from logzero import logger as log
 from hyperglass_agent.config import commands
 from hyperglass_agent.config import params
 
-PARSER_MAP = {"bird": parse_bird_output, "frr": parse_frr_output}
-PARSER = PARSER_MAP[params.mode]
-
 
 async def run_query(query):
     log.debug(f"Query: {query}")
+    parser_map = {"bird": parse_bird_output, "frr": parse_frr_output}
+    parser = parser_map[params.mode]
+
     command_raw = operator.attrgetter(
         ".".join([params.mode, query.afi, query.query_type])
     )(commands)
@@ -34,10 +34,10 @@ async def run_query(query):
     stdout, stderr = await proc.communicate()
 
     if stdout:
-        log.debug(f"Parser: {PARSER.__name__}")
+        log.debug(f"Parser: {parser.__name__}")
 
         raw_output = stdout.decode()
-        output = await PARSER(
+        output = await parser(
             raw=raw_output, query_data=query, not_found=params.not_found_message
         )
         return output
