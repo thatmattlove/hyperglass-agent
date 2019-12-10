@@ -2,7 +2,6 @@
 import asyncio
 import operator
 from hyperglass_agent.exceptions import ExecutionError
-from hyperglass_agent.exceptions import QueryError
 
 # Third Party Imports
 from logzero import logger as log
