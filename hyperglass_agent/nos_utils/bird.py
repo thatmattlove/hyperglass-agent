@@ -34,7 +34,7 @@ async def get_bird_version():
 
 
 async def parse_bird_output(raw):
-    raw_split = re.split(r"(Table)", raw)
+    raw_split = re.split(r"(Table)", raw.strip())
     raw_joined = "".join(raw_split[1::])
     log.debug(f"Parsed output:\n{raw_joined}")
     return raw_joined

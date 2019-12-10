@@ -34,9 +34,11 @@ async def run_query(query):
     stdout, stderr = await proc.communicate()
 
     if stdout:
-        output = stdout.decode()
+        raw_output = stdout.decode()
         if PARSER is not None:
-            output = await PARSER(output)
+            output = await PARSER(raw_output)
+        else:
+            output = raw_output
         return output
 
     if stderr:

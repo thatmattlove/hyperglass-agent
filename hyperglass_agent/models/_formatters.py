@@ -1,6 +1,3 @@
-from logzero import logger as log
-
-
 def format_bird(bird_version, ip_version, cmd):
     """
     Prefixes the configured BIRD command with the appropriate BIRD CLI
@@ -10,9 +7,8 @@ def format_bird(bird_version, ip_version, cmd):
     prefix_map = {1: {4: "birdc -r", 6: "birdc6 -r"}, 2: {4: "birdc -r", 6: "birdc -r"}}
 
     cmd_prefix = prefix_map[bird_version][ip_version]
-    command = f"{cmd_prefix} {cmd}"
+    command = f'{cmd_prefix} "{cmd}"'
 
-    log.debug(f"Constructed command: {command}")
     return command
 
 
