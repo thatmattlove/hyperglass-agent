@@ -15,6 +15,8 @@ from hyperglass_agent.config import params
 PARSER_MAP = {"bird": parse_bird_output, "frr": parse_frr_output}
 PARSER = PARSER_MAP[params.mode]
 
+log.debug(f"Parser: {PARSER.__name__}")
+
 
 async def run_query(query):
     log.debug(f"Query: {query}")
