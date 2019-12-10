@@ -17,4 +17,4 @@ def format_bird(bird_version, ip_version, cmd):
 
 
 def format_frr(cmd):
-    return f'vtysh -c "{cmd}"'
+    return f'vtysh -uc "{cmd}"'

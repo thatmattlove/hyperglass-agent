@@ -2,6 +2,7 @@
 import asyncio
 import operator
 from hyperglass_agent.exceptions import ExecutionError
+from hyperglass_agent.nos_utils.bird import parse_bird_output
 
 # Third Party Imports
 from logzero import logger as log
@@ -9,6 +10,10 @@ from logzero import logger as log
 # Project Imports
 from hyperglass_agent.config import commands
 from hyperglass_agent.config import params
+
+PARSER_MAP = {"bird": parse_bird_output, "frr": None}
+
+PARSER = PARSER_MAP[params.mode]
 
 
 async def run_query(query):
@@ -27,7 +32,12 @@ async def run_query(query):
         command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await proc.communicate()
+
     if stdout:
-        return stdout.decode()
+        output = stdout.decode()
+        if PARSER is not None:
+            output = await PARSER(output)
+        return output
+
     if stderr:
         raise ExecutionError(stderr.decode())
