@@ -3,6 +3,9 @@ from pydantic import validator
 from hyperglass_agent.constants import AGENT_QUERY
 from hyperglass_agent.models._utils import HyperglassModel
 from hyperglass_agent.models._formatters import format_bird, format_frr
+from hyperglass_agent.nos_utils.bird import get_bird_version
+
+BIRD_VERSION = get_bird_version()
 
 
 class Command(HyperglassModel):
@@ -147,7 +150,7 @@ class Commands(HyperglassModel):
             @validator(*AGENT_QUERY, allow_reuse=True)
             def prefix_bird(cls, value):
                 if "birdc" not in value:
-                    value = format_bird(4, value)
+                    value = format_bird(BIRD_VERSION, 4, value)
                 return value
 
         class VPNIPv6(Command.VPNIPv6):
