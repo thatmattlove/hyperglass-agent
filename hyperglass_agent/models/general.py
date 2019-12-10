@@ -19,7 +19,7 @@ class General(HyperglassModel):
     mode: str
     secret: SecretStr
     valid_duration: int = 60
-    not_found_message: str = "not found."
+    not_found_message: str = "{target} not found. ({afi})"
 
     @validator("mode")
     def validate_mode(cls, value):
