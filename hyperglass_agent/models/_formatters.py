@@ -31,7 +31,9 @@ async def get_bird_version():
     stdout, stderr = await proc.communicate()
     if stdout:
         raw_output = stdout.decode("utf-8")
-    if stderr:
+    if stderr and "BIRD" in stderr:
+        raw_output = stderr.decode("utf-8")
+    elif stderr and "BIRD" not in stderr:
         raise ExecutionError(stderr.decode("utf-8"))
     # Extract numbers from string as list of numbers
     version_str = ".".join(re.findall(r"\d+", raw_output))
