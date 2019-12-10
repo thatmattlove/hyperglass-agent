@@ -3,6 +3,7 @@ import asyncio
 import operator
 from hyperglass_agent.exceptions import ExecutionError
 from hyperglass_agent.nos_utils.bird import parse_bird_output
+from hyperglass_agent.nos_utils.frr import parse_frr_output
 
 # Third Party Imports
 from logzero import logger as log
@@ -11,7 +12,7 @@ from logzero import logger as log
 from hyperglass_agent.config import commands
 from hyperglass_agent.config import params
 
-PARSER_MAP = {"bird": parse_bird_output, "frr": None}
+PARSER_MAP = {"bird": parse_bird_output, "frr": parse_frr_output}
 PARSER = PARSER_MAP[params.mode]
 
 
