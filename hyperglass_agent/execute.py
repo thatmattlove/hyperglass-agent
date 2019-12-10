@@ -12,7 +12,6 @@ from hyperglass_agent.config import commands
 from hyperglass_agent.config import params
 
 PARSER_MAP = {"bird": parse_bird_output, "frr": None}
-
 PARSER = PARSER_MAP[params.mode]
 
 
@@ -36,7 +35,9 @@ async def run_query(query):
     if stdout:
         raw_output = stdout.decode()
         if PARSER is not None:
-            output = await PARSER(raw=raw_output, query_data=query)
+            output = await PARSER(
+                raw=raw_output, query_data=query, not_found=params.not_found_message
+            )
         else:
             output = raw_output
         return output
