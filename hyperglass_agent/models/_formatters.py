@@ -30,18 +30,20 @@ async def get_bird_version():
     stdout, stderr = await proc.communicate()
     if stdout:
         raw_output = stdout.decode("utf-8")
-    if stderr and "BIRD version" in stderr:
+    if stderr and b"BIRD version" in stderr:
         raw_output = stderr.decode("utf-8")
-    elif stderr and "BIRD version" not in stderr:
+    elif stderr and b"BIRD version" not in stderr:
         raise ExecutionError(stderr.decode("utf-8"))
 
     log.debug(f"Raw output: {raw_output}")
+
     # Extract numbers from string as list of numbers
     version_str = ".".join(re.findall(r"\d+", raw_output))
     # Convert number strings to floats
     version_float = [float(n) for n in version_str]
     # Add floats to produce whole number as version number
     version_sum = fsum(version_float)
+
     if version_sum < 2:
         version = 1
     else:
@@ -56,8 +58,7 @@ def format_bird(ip_version, cmd):
     Prefixes the configured BIRD command with the appropriate BIRD CLI
     command.
     """
-    # bird_version = get_bird_version()
-    bird_version = 2
+    bird_version = get_bird_version()
     prefix_map = {1: {4: "birdc -r", 6: "birdc6 -r"}, 2: {4: "birdc -r", 6: "birdc -r"}}
 
     cmd_prefix = prefix_map[bird_version][ip_version]
