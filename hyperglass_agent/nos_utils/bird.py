@@ -1,5 +1,6 @@
 import asyncio
 import re
+from hyperglass_agent.config import params
 from hyperglass_agent.util import top_level_async
 from hyperglass_agent.exceptions import ExecutionError
 from logzero import logger as log
@@ -33,8 +34,12 @@ async def get_bird_version():
     return version
 
 
-async def parse_bird_output(raw):
+async def parse_bird_output(raw, query_data):
     raw_split = re.split(r"(Table)", raw.strip())
     raw_joined = "".join(raw_split[1::])
-    log.debug(f"Parsed output:\n{raw_joined}")
-    return raw_joined
+    if not raw_joined:
+        output = f'{query_data["target"]} {params.not_found_message}'
+    else:
+        output = raw_joined
+    log.debug(f"Parsed output:\n{output}")
+    return output
