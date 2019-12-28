@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-import json
-import shutil
-import platform
-import datetime
+# Standard Library Imports
 import asyncio
+import datetime
+import json
+import platform
+import shutil
 from functools import update_wrapper
-import httpx
-import click
-import stackprinter
 from pathlib import Path
+
+# Third Party Imports
+import click
+import httpx
 import jwt
+import stackprinter
 
 stackprinter.set_excepthook(style="darkbg2")
 

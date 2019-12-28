@@ -1,5 +1,6 @@
-from logzero import logger as log
+# Project Imports
 from hyperglass_agent.constants import AFI_DISPLAY_MAP
+from hyperglass_agent.util import log
 
 
 async def parse_frr_output(raw, query_data, not_found):

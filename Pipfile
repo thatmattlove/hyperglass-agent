@@ -10,7 +10,6 @@ isort = "*"
 
 [packages]
 pyyaml = "*"
-logzero = "*"
 cryptography = "*"
 pyjwt = "*"
 responder = "*"
@@ -18,6 +17,8 @@ httpx = "==0.9.*"
 pydantic = "*"
 stackprinter = "*"
 click = "*"
+loguru = "*"
+uvloop = "*"
 
 [requires]
 python_version = "3.7"

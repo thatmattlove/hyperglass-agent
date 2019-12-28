@@ -1,16 +1,14 @@
 # Standard Library Imports
 import asyncio
 import operator
-from hyperglass_agent.exceptions import ExecutionError
-from hyperglass_agent.nos_utils.bird import parse_bird_output
-from hyperglass_agent.nos_utils.frr import parse_frr_output
-
-# Third Party Imports
-from logzero import logger as log
 
 # Project Imports
 from hyperglass_agent.config import commands
 from hyperglass_agent.config import params
+from hyperglass_agent.exceptions import ExecutionError
+from hyperglass_agent.nos_utils.bird import parse_bird_output
+from hyperglass_agent.nos_utils.frr import parse_frr_output
+from hyperglass_agent.util import log
 
 
 async def run_query(query):

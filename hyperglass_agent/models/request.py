@@ -1,7 +1,7 @@
 # Standard Library Imports
 import ipaddress
-from typing import Union
 from typing import Optional
+from typing import Union
 
 # Third Party Imports
 from pydantic import BaseModel

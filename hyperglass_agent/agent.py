@@ -4,19 +4,17 @@ from pathlib import Path
 
 # Third Party Imports
 import responder
-from logzero import logger as log
 from pydantic import ValidationError
 
 # Project Imports
+from hyperglass_agent.config import LOG_LEVEL
 from hyperglass_agent.config import params
 from hyperglass_agent.exceptions import HyperglassAgentError
 from hyperglass_agent.execute import run_query
-from hyperglass_agent.payload import jwt_encode, jwt_decode
 from hyperglass_agent.models.request import Request
-
-LOG_LEVEL = "info"
-if params.debug:
-    LOG_LEVEL = "debug"
+from hyperglass_agent.payload import jwt_decode
+from hyperglass_agent.payload import jwt_encode
+from hyperglass_agent.util import log
 
 WORKING_DIR = Path(__file__).parent
 
@@ -59,10 +57,11 @@ async def query_entrypoint(req, resp):
 
 
 if __name__ == "__main__":
+    log.debug("Debug On")
     api.run(
         address=params.listen_address.compressed,
         port=params.port,
-        log_level=LOG_LEVEL,
+        log_level=LOG_LEVEL.lower(),
         debug=params.debug,
         ssl_keyfile=KEY_FILE,
         ssl_certfile=CERT_FILE,

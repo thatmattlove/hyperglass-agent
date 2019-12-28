@@ -6,10 +6,13 @@ import yaml
 from pydantic import ValidationError
 
 # Project Imports
+from hyperglass_agent.constants import LOG_HANDLER
+from hyperglass_agent.constants import LOG_LEVELS
 from hyperglass_agent.exceptions import ConfigError
 from hyperglass_agent.exceptions import ConfigInvalid
 from hyperglass_agent.models.commands import Commands
 from hyperglass_agent.models.general import General
+from hyperglass_agent.util import log
 
 WORKING_DIR = Path(__file__).resolve().parent
 
@@ -29,9 +32,11 @@ try:
     raw_config_commands = raw_config.pop("commands", None)
     user_config = General(**raw_config)
     if raw_config_commands is not None:
-        user_commands = Commands.import_params(**raw_config_commands)
+        user_commands = Commands.import_params(
+            mode=user_config.mode, **raw_config_commands
+        )
     else:
-        user_commands = Commands()
+        user_commands = Commands.import_params(mode=user_config.mode)
 except ValidationError as validation_errors:
     errors = validation_errors.errors()
     for error in errors:
@@ -39,6 +44,15 @@ except ValidationError as validation_errors:
             field=": ".join([str(item) for item in error["loc"]]),
             error_msg=error["msg"],
         )
+
+LOG_LEVEL = "INFO"
+if user_config.debug:
+    LOG_LEVEL = "DEBUG"
+    LOG_HANDLER["level"] = LOG_LEVEL
+    log.remove()
+    log.configure(handlers=[LOG_HANDLER], levels=LOG_LEVELS)
+
+log.debug("Debug On")
 
 params = user_config
 commands = user_commands

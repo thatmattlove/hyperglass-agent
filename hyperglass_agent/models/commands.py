@@ -1,9 +1,12 @@
-# Project Imports
+# Third Party Imports
 from pydantic import validator
+
+# Project Imports
 from hyperglass_agent.constants import AGENT_QUERY
+from hyperglass_agent.constants import DEFAULT_MODE
+from hyperglass_agent.models._formatters import format_bird
+from hyperglass_agent.models._formatters import format_frr
 from hyperglass_agent.models._utils import HyperglassModel
-from hyperglass_agent.models._formatters import format_bird, format_frr
-from hyperglass_agent.nos_utils.bird import BIRD_VERSION
 
 
 class Command(HyperglassModel):
@@ -12,6 +15,7 @@ class Command(HyperglassModel):
     class IPv4(HyperglassModel):
         """Class model for non-default dual afi commands"""
 
+        mode: str = DEFAULT_MODE
         bgp_route: str = ""
         bgp_aspath: str = ""
         bgp_community: str = ""
@@ -21,6 +25,7 @@ class Command(HyperglassModel):
     class IPv6(HyperglassModel):
         """Class model for non-default ipv4 commands"""
 
+        mode: str = DEFAULT_MODE
         bgp_route: str = ""
         bgp_aspath: str = ""
         bgp_community: str = ""
@@ -30,6 +35,7 @@ class Command(HyperglassModel):
     class VPNIPv4(HyperglassModel):
         """Class model for non-default ipv6 commands"""
 
+        mode: str = DEFAULT_MODE
         bgp_route: str = ""
         bgp_aspath: str = ""
         bgp_community: str = ""
@@ -39,30 +45,33 @@ class Command(HyperglassModel):
     class VPNIPv6(HyperglassModel):
         """Class model for non-default ipv6 commands"""
 
+        mode: str = DEFAULT_MODE
         bgp_route: str = ""
         bgp_aspath: str = ""
         bgp_community: str = ""
         ping: str = ""
         traceroute: str = ""
 
-    ipv4_default: IPv4 = IPv4()
-    ipv6_default: IPv6 = IPv6()
-    ipv4_vpn: VPNIPv4 = VPNIPv4()
-    ipv6_vpn: VPNIPv6 = VPNIPv6()
+    mode: str = DEFAULT_MODE
+    ipv4_default: IPv4 = IPv4(mode=mode)
+    ipv6_default: IPv6 = IPv6(mode=mode)
+    ipv4_vpn: VPNIPv4 = VPNIPv4(mode=mode)
+    ipv6_vpn: VPNIPv6 = VPNIPv6(mode=mode)
 
 
 class Commands(HyperglassModel):
     """Base class for commands class"""
 
     @classmethod
-    def import_params(cls, input_params):
+    def import_params(cls, mode, input_params=None):
         """
         Imports passed dict from YAML config, dynamically sets
         attributes for the commands class.
         """
-        obj = Commands()
-        for (nos, cmds) in input_params.items():
-            setattr(Commands, nos, Command(**cmds))
+        obj = Commands(mode=mode)
+        if input_params is not None:
+            for (nos, cmds) in input_params.items():
+                setattr(Commands, nos, Command(mode=mode, **cmds))
         return obj
 
     class FRR(Command):
@@ -128,10 +137,11 @@ class Commands(HyperglassModel):
                     value = format_frr(value)
                 return value
 
-        ipv4_default: IPv4 = IPv4()
-        ipv6_default: IPv6 = IPv6()
-        ipv4_vpn: VPNIPv4 = VPNIPv4()
-        ipv6_vpn: VPNIPv6 = VPNIPv6()
+        mode: str = DEFAULT_MODE
+        ipv4_default: IPv4 = IPv4(mode=mode)
+        ipv6_default: IPv6 = IPv6(mode=mode)
+        ipv4_vpn: VPNIPv4 = VPNIPv4(mode=mode)
+        ipv6_vpn: VPNIPv6 = VPNIPv6(mode=mode)
 
     class BIRD(Command):
         """Class model for default cisco_ios commands"""
@@ -139,6 +149,7 @@ class Commands(HyperglassModel):
         class VPNIPv4(Command.VPNIPv4):
             """Default commands for dual afi commands"""
 
+            mode: str
             bgp_community: str = "show route all where {target} ~ bgp_community"
             bgp_aspath: str = "show route all where bgp_path ~ {target}"
             bgp_route: str = "show route all where {target} ~ net"
@@ -146,14 +157,15 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_bird(cls, value):
+            def prefix_bird(cls, value, values):
                 if "birdc" not in value:
-                    value = format_bird(BIRD_VERSION, 4, value)
+                    value = format_bird(4, value, values["mode"])
                 return value
 
         class VPNIPv6(Command.VPNIPv6):
             """Default commands for dual afi commands"""
 
+            mode: str
             bgp_community: str = "show route all where {target} ~ bgp_community"
             bgp_aspath: str = "show route all where bgp_path ~ {target}"
             bgp_route: str = "show route all where {target} ~ net"
@@ -161,14 +173,15 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_bird(cls, value):
+            def prefix_bird(cls, value, values):
                 if "birdc" not in value:
-                    value = format_bird(BIRD_VERSION, 6, value)
+                    value = format_bird(6, value, values["mode"])
                 return value
 
         class IPv4(Command.IPv4):
             """Default commands for ipv4 commands"""
 
+            mode: str
             bgp_community: str = "show route all where {target} ~ bgp_community"
             bgp_aspath: str = "show route all where bgp_path ~ {target}"
             bgp_route: str = "show route all where {target} ~ net"
@@ -176,14 +189,15 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_bird(cls, value):
+            def prefix_bird(cls, value, values):
                 if "birdc" not in value:
-                    value = format_bird(BIRD_VERSION, 4, value)
+                    value = format_bird(4, value, values["mode"])
                 return value
 
         class IPv6(Command.IPv6):
             """Default commands for ipv6 commands"""
 
+            mode: str
             bgp_community: str = "show route all where {target} ~ bgp_community"
             bgp_aspath: str = "show route all where bgp_path ~ {target}"
             bgp_route: str = "show route all where {target} ~ net"
@@ -191,15 +205,17 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_bird(cls, value):
+            def prefix_bird(cls, value, values):
                 if "birdc" not in value:
-                    value = format_bird(BIRD_VERSION, 6, value)
+                    value = format_bird(6, value, values["mode"])
                 return value
 
-        ipv4_default: IPv4 = IPv4()
-        ipv6_default: IPv6 = IPv6()
-        ipv4_vpn: VPNIPv4 = VPNIPv4()
-        ipv6_vpn: VPNIPv6 = VPNIPv6()
+        mode: str = DEFAULT_MODE
+        ipv4_default: IPv4 = IPv4(mode=mode)
+        ipv6_default: IPv6 = IPv6(mode=mode)
+        ipv4_vpn: VPNIPv4 = VPNIPv4(mode=mode)
+        ipv6_vpn: VPNIPv6 = VPNIPv6(mode=mode)
 
-    bird: BIRD = BIRD()
-    frr: FRR = FRR()
+    mode: str = DEFAULT_MODE
+    bird: BIRD = BIRD(mode=mode)
+    frr: FRR = FRR(mode=mode)

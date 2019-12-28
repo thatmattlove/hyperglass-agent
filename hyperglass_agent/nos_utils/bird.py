@@ -1,9 +1,12 @@
+# Standard Library Imports
 import asyncio
 import re
-from logzero import logger as log
-from hyperglass_agent.util import top_level_async
-from hyperglass_agent.exceptions import ExecutionError
+
+# Project Imports
 from hyperglass_agent.constants import AFI_DISPLAY_MAP
+from hyperglass_agent.exceptions import ExecutionError
+from hyperglass_agent.util import log
+from hyperglass_agent.util import top_level_async
 
 
 @top_level_async
@@ -24,7 +27,7 @@ async def get_bird_version():
     elif stderr and b"command not found" in stderr:
         raise ExecutionError(
             (
-                f"BIRD mode is configured, but bird does not appear to be "
+                "BIRD mode is configured, but bird does not appear to be "
                 f'installed: {stderr.decode("utf-8")}'
             )
         )
@@ -53,6 +56,3 @@ async def parse_bird_output(raw, query_data, not_found):
         output = raw_joined
     log.debug(f"Parsed output:\n{output}")
     return output
-
-
-BIRD_VERSION = get_bird_version()

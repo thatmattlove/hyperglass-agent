@@ -1,5 +1,10 @@
-import jwt
+# Standard Library Imports
 import datetime
+
+# Third Party Imports
+import jwt
+
+# Project Imports
 from hyperglass_agent.config import params
 from hyperglass_agent.exceptions import SecurityError
 
