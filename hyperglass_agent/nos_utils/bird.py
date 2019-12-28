@@ -21,6 +21,13 @@ async def get_bird_version():
         raw_output = stdout.decode("utf-8")
     if stderr and b"BIRD version" in stderr:
         raw_output = stderr.decode("utf-8")
+    elif stderr and b"command not found" in stderr:
+        raise ExecutionError(
+            (
+                f"BIRD mode is configured, but bird does not appear to be "
+                f'installed: {stderr.decode("utf-8")}'
+            )
+        )
     elif stderr and b"BIRD version" not in stderr:
         raise ExecutionError(stderr.decode("utf-8"))
 
