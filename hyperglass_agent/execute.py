@@ -36,15 +36,18 @@ async def run_query(query):
     if stderr:
         raise ExecutionError(stderr.decode())
 
+    output = ""
+
     if stdout:
         log.debug(f"Parser: {parser.__name__}")
 
         raw_output = stdout.decode()
-        output = await parser(
+        output += await parser(
             raw=raw_output, query_data=query, not_found=params.not_found_message
         )
+        return output
 
-    else:
+    if not output and proc.returncode == 0:
         output = await parser(
             raw="", query_data=query, not_found=params.not_found_message
         )
