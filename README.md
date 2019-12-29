@@ -2,11 +2,22 @@
 
 This repository is a **work in progress** replacement for its soon-to-be predecessors [hyperglass-frr](https://github.com/checktheroads/hyperglass-frr) and [hyperglass-bird](https://github.com/checktheroads/hyperglass-bird). It is **NOT** functional yet!
 
-# `hyperglass-agent`
+# hyperglass-agent
+
+<hr>
+
+<div align="center">
+
+![LOC](https://raw.githubusercontent.com/checktheroads/hyperglass-agent/master/line_count.svg?sanitize=true)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+</div>
+
+<hr>
 
 The hyperglass agent is a RESTful API agent for [hyperglass](https://github.com/checktheroads/hyperglass), currently supporting:
-    - [Free Range Routing](https://frrouting.org/)
-    - [BIRD Routing Daemon](https://bird.network.cz/)
+
+    * [Free Range Routing](https://frrouting.org/)
+    * [BIRD Routing Daemon](https://bird.network.cz/)
 
 # Installation
 
@@ -56,3 +67,7 @@ WantedBy=multi-user.target
 sudo systemctl enable hyperglass-agent
 sudo systemctl restart hyperglass-agent
 ```
+
+## License
+
+[Clear BSD License](https://github.com/checktheroads/hyperglass-agent/master/LICENSE)

@@ -26,6 +26,7 @@ flake8-print = "*"
 flake8-return = "*"
 pep8-naming = "*"
 pre-commit = "*"
+anybadge = "*"
 
 [packages]
 pyyaml = "*"
