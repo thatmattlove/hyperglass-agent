@@ -295,9 +295,7 @@ def line_count_badge(directory):
         badge_file.unlink()
 
     count = count_lines(directory)
-    badge = anybadge.Badge(
-        label="Lines of Code", value=count, default_color="#007ec6", num_padding_chars=1
-    )
+    badge = anybadge.Badge(label="Lines of Code", value=count, default_color="#007ec6")
     badge.write_badge(file_name)
     click.echo(
         click.style("Created line count badge. Lines: ", fg="white")
