@@ -54,7 +54,7 @@ if user_config.debug:
     log.remove()
     log.configure(handlers=[LOG_HANDLER], levels=LOG_LEVELS)
 
-log.debug("Debug On")
+log.debug("Debugging Enabled")
 
 params = user_config
 commands = user_commands

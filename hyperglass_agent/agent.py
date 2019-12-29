@@ -59,7 +59,6 @@ async def query_entrypoint(req, resp):
 
 
 if __name__ == "__main__":
-    log.debug("Debugging Enabled")
     api.run(
         address=params.listen_address.compressed,
         port=params.port,
