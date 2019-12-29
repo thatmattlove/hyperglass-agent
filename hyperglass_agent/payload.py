@@ -1,3 +1,5 @@
+"""Handle JSON Web Token Encoding & Decoding."""
+
 # Standard Library Imports
 import datetime
 
@@ -10,6 +12,7 @@ from hyperglass_agent.exceptions import SecurityError
 
 
 async def jwt_decode(payload):
+    """Decode the request claim."""
     try:
         decoded = jwt.decode(
             payload, params.secret.get_secret_value(), algorithm="HS256"
@@ -21,6 +24,7 @@ async def jwt_decode(payload):
 
 
 async def jwt_encode(response):
+    """Encode the response claim."""
     payload = {
         "payload": response,
         "nbf": datetime.datetime.utcnow(),

@@ -1,3 +1,5 @@
+"""Command definitions for supported platforms."""
+
 # Third Party Imports
 from pydantic import validator
 
@@ -10,10 +12,10 @@ from hyperglass_agent.models._utils import HyperglassModel
 
 
 class Command(HyperglassModel):
-    """Class model for non-default commands"""
+    """Class model for non-default commands."""
 
     class IPv4(HyperglassModel):
-        """Class model for non-default dual afi commands"""
+        """Class model for non-default dual afi commands."""
 
         mode: str = DEFAULT_MODE
         bgp_route: str = ""
@@ -23,7 +25,7 @@ class Command(HyperglassModel):
         traceroute: str = ""
 
     class IPv6(HyperglassModel):
-        """Class model for non-default ipv4 commands"""
+        """Class model for non-default ipv4 commands."""
 
         mode: str = DEFAULT_MODE
         bgp_route: str = ""
@@ -33,7 +35,7 @@ class Command(HyperglassModel):
         traceroute: str = ""
 
     class VPNIPv4(HyperglassModel):
-        """Class model for non-default ipv6 commands"""
+        """Class model for non-default ipv6 commands."""
 
         mode: str = DEFAULT_MODE
         bgp_route: str = ""
@@ -43,7 +45,7 @@ class Command(HyperglassModel):
         traceroute: str = ""
 
     class VPNIPv6(HyperglassModel):
-        """Class model for non-default ipv6 commands"""
+        """Class model for non-default ipv6 commands."""
 
         mode: str = DEFAULT_MODE
         bgp_route: str = ""
@@ -60,13 +62,20 @@ class Command(HyperglassModel):
 
 
 class Commands(HyperglassModel):
-    """Base class for commands class"""
+    """Base class for all commands."""
 
     @classmethod
     def import_params(cls, mode, input_params=None):
-        """
-        Imports passed dict from YAML config, dynamically sets
-        attributes for the commands class.
+        """Import YAML config, dynamically set attributes for each NOS class.
+
+        Arguments:
+            mode {str} -- Agent mode
+
+        Keyword Arguments:
+            input_params {dict} -- Overidden commands (default: {None})
+
+        Returns:
+            {object} -- Validated command object
         """
         obj = Commands(mode=mode)
         if input_params is not None:
@@ -75,10 +84,10 @@ class Commands(HyperglassModel):
         return obj
 
     class FRR(Command):
-        """Class model for default cisco_ios commands"""
+        """Class model for default cisco_ios commands."""
 
         class VPNIPv4(Command.VPNIPv4):
-            """Default commands for dual afi commands"""
+            """Default commands for dual afi commands."""
 
             bgp_community: str = "show bgp vrf {vrf} ipv4 unicast community {target}"
             bgp_aspath: str = "show bgp vrf {vrf} ipv4 unicast regexp {target}"
@@ -87,13 +96,18 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_frr(cls, value):
+            def prefix_frr(cls, value):  # noqa: N805
+                """Prefix command if needed.
+
+                Returns:
+                    {str} -- Prefixed command
+                """
                 if "vtysh" not in value:
                     value = format_frr(value)
                 return value
 
         class VPNIPv6(Command.VPNIPv6):
-            """Default commands for dual afi commands"""
+            """Default commands for dual afi commands."""
 
             bgp_community: str = "show bgp vrf {vrf} ipv6 unicast community {target}"
             bgp_aspath: str = "show bgp vrf {vrf} ipv6 unicast regexp {target}"
@@ -102,13 +116,18 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_frr(cls, value):
+            def prefix_frr(cls, value):  # noqa: N805
+                """Prefix command if needed.
+
+                Returns:
+                    {str} -- Prefixed command
+                """
                 if "vtysh" not in value:
                     value = format_frr(value)
                 return value
 
         class IPv4(Command.IPv4):
-            """Default commands for ipv4 commands"""
+            """Default commands for ipv4 commands."""
 
             bgp_community: str = "show bgp ipv4 unicast community {target}"
             bgp_aspath: str = "show bgp ipv4 unicast regexp {target}"
@@ -117,13 +136,18 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_frr(cls, value):
+            def prefix_frr(cls, value):  # noqa: N805
+                """Prefix command if needed.
+
+                Returns:
+                    {str} -- Prefixed command
+                """
                 if "vtysh" not in value:
                     value = format_frr(value)
                 return value
 
         class IPv6(Command.IPv6):
-            """Default commands for ipv6 commands"""
+            """Default commands for ipv6 commands."""
 
             bgp_community: str = "show bgp ipv6 unicast community {target}"
             bgp_aspath: str = "show bgp ipv6 unicast regexp {target}"
@@ -132,7 +156,12 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_frr(cls, value):
+            def prefix_frr(cls, value):  # noqa: N805
+                """Prefix command if needed.
+
+                Returns:
+                    {str} -- Prefixed command
+                """
                 if "vtysh" not in value:
                     value = format_frr(value)
                 return value
@@ -144,10 +173,10 @@ class Commands(HyperglassModel):
         ipv6_vpn: VPNIPv6 = VPNIPv6(mode=mode)
 
     class BIRD(Command):
-        """Class model for default cisco_ios commands"""
+        """Class model for default cisco_ios commands."""
 
         class VPNIPv4(Command.VPNIPv4):
-            """Default commands for dual afi commands"""
+            """Default dual AFI commands."""
 
             mode: str
             bgp_community: str = "show route all where {target} ~ bgp_community"
@@ -157,13 +186,18 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_bird(cls, value, values):
+            def prefix_bird(cls, value, values):  # noqa: N805
+                """Prefix command if needed.
+
+                Returns:
+                    {str} -- Prefixed command
+                """
                 if "birdc" not in value:
                     value = format_bird(4, value, values["mode"])
                 return value
 
         class VPNIPv6(Command.VPNIPv6):
-            """Default commands for dual afi commands"""
+            """Default dual AFI commands."""
 
             mode: str
             bgp_community: str = "show route all where {target} ~ bgp_community"
@@ -173,13 +207,18 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_bird(cls, value, values):
+            def prefix_bird(cls, value, values):  # noqa: N805
+                """Prefix command if needed.
+
+                Returns:
+                    {str} -- Prefixed command
+                """
                 if "birdc" not in value:
                     value = format_bird(6, value, values["mode"])
                 return value
 
         class IPv4(Command.IPv4):
-            """Default commands for ipv4 commands"""
+            """Default IPv4 commands."""
 
             mode: str
             bgp_community: str = "show route all where {target} ~ bgp_community"
@@ -189,13 +228,18 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -4 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_bird(cls, value, values):
+            def prefix_bird(cls, value, values):  # noqa: N805
+                """Prefix command if needed.
+
+                Returns:
+                    {str} -- Prefixed command
+                """
                 if "birdc" not in value:
                     value = format_bird(4, value, values["mode"])
                 return value
 
         class IPv6(Command.IPv6):
-            """Default commands for ipv6 commands"""
+            """Default IPv6 commands."""
 
             mode: str
             bgp_community: str = "show route all where {target} ~ bgp_community"
@@ -205,7 +249,12 @@ class Commands(HyperglassModel):
             traceroute: str = "traceroute -6 -w 1 -q 1 -s {source} {target}"
 
             @validator(*AGENT_QUERY, allow_reuse=True)
-            def prefix_bird(cls, value, values):
+            def prefix_bird(cls, value, values):  # noqa: N805
+                """Prefix command if needed.
+
+                Returns:
+                    {str} -- Prefixed command
+                """
                 if "birdc" not in value:
                     value = format_bird(6, value, values["mode"])
                 return value

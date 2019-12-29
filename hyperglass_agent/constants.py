@@ -1,3 +1,5 @@
+"""Constant definitions used throughout the application."""
+
 # Standard Library Imports
 import sys
 

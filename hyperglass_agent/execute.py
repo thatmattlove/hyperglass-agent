@@ -1,3 +1,5 @@
+"""Construct, execute, parse, and return the requested query."""
+
 # Standard Library Imports
 import asyncio
 import operator
@@ -12,7 +14,19 @@ from hyperglass_agent.util import log
 
 
 async def run_query(query):
+    """Execute validated query & parse the results.
+
+    Arguments:
+        query {object} -- Validated query object
+
+    Raises:
+        ExecutionError: If stderr exists
+
+    Returns:
+        {str} -- Parsed output string
+    """
     log.debug(f"Query: {query}")
+
     parser_map = {"bird": parse_bird_output, "frr": parse_frr_output}
     parser = parser_map[params.mode]
 
@@ -32,7 +46,9 @@ async def run_query(query):
     stdout, stderr = await proc.communicate()
 
     if stderr:
-        raise ExecutionError(stderr.decode())
+        err_output = stderr.decode()
+        log.error(err_output)
+        raise ExecutionError(err_output)
 
     output = ""
 

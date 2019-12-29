@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""CLI for hyperglass-agent."""
+
 # Standard Library Imports
 import asyncio
 import datetime
@@ -26,7 +28,7 @@ TEST_QUERY_DATA = {
     "source": "192.0.2.1",
     "target": "1.1.1.1",
 }
-TEST_SECRET = "TestSecret12345"
+TEST_SECRET = "TestSecret12345"  # noqa: S105
 
 # Initialize shutil copy function
 cp = shutil.copyfile
@@ -43,6 +45,14 @@ KEY_FILE = MODULE_DIR / "agent_key.pem"
 
 
 def async_command(func):
+    """Allow async functions to be executed syncronously.
+
+    Arguments:
+        func {function} -- Asyncronous function
+
+    Returns:
+        {function} -- Syncronous function
+    """
     func = asyncio.coroutine(func)
 
     def wrapper(*args, **kwargs):
@@ -54,10 +64,12 @@ def async_command(func):
 
 @click.group()
 def cli():
+    """Click command group."""
     pass
 
 
 async def decode(payload, secret):
+    """Decode JWT payloads."""
     try:
         decoded = jwt.decode(payload, secret, algorithm="HS256")
         decoded = decoded["payload"]
@@ -67,6 +79,7 @@ async def decode(payload, secret):
 
 
 async def encode(response, secret):
+    """Encode JWT responses."""
     payload = {
         "payload": response,
         "nbf": datetime.datetime.utcnow(),
@@ -100,6 +113,15 @@ async def encode(response, secret):
 @click.option("--ssl", is_flag=True, default=False, help="Use HTTPS")
 @async_command
 async def test_agent(host, port, secret, query_data, ssl):
+    """Test a running hyperglass-agent instance.
+
+    Arguments:
+        host {str} -- IP address or hostname
+        port {int} -- Port
+        secret {str} -- JWT encoding secret
+        query_data {dict} -- Query data
+        ssl {bool} -- Use HTTPS
+    """
     encoded = await encode(query_data, secret)
     if ssl:
         protocol = "https"
@@ -128,6 +150,15 @@ async def test_agent(host, port, secret, query_data, ssl):
 )
 @click.option("--show", is_flag=True, help="Show Private Key in CLI Output")
 def gen_cert(cn, o, start, end, show):
+    """Generate SSL certificate keypair.
+
+    Arguments:
+        cn {str} -- Common Name
+        o {str} -- Organization
+        start {str} -- Start Time
+        end {str} -- End Time
+        show {bool} -- Show private key in CLI
+    """
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric import rsa
@@ -189,15 +220,51 @@ def gen_cert(cn, o, start, end, show):
 
 
 @cli.command("dev-server", help="Start development web server")
-@click.option("-h", "--host", type=str, default="0.0.0.0", help="Listening IP")
+@click.option(
+    "-h", "--host", type=str, default="0.0.0.0", help="Listening IP"  # noqa: S104
+)
 @click.option("-p", "--port", type=int, default=8080, help="TCP Port")
 def dev_server(host, port):
+    """Start the development web server.
+
+    Arguments:
+        host {str} -- Listening IP address
+        port {int} -- TCP port
+
+    Raises:
+        click.ClickException: Any raised exception message
+    """
     try:
         from hyperglass_agent.agent import api
 
         api.run(address=host, port=port, debug=True, log_level="debug")
     except Exception as e:
         raise click.ClickException(click.style(str(e), fg="red", bold=True))
+
+
+@cli.command("line-count", help="Get line count for source code.")
+@click.option(
+    "-d",
+    "--directory",
+    type=str,
+    default="hyperglass_agent",
+    help="Source code directory",
+)
+def line_count(directory):
+    """Get lines of code.
+
+    Arguments:
+        directory {str} -- Source code directory
+    """
+    from develop import count_lines
+
+    count = count_lines(directory)
+    click.echo(
+        NL
+        + click.style("Line Count: ", fg="blue")
+        + click.style(str(count), fg="green", bold=True)
+        + NL
+    )
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
+"""Web server frontend, passes raw query to backend validation & execution."""
+
 # Standard Library Imports
 import json
 from pathlib import Path
@@ -26,7 +28,7 @@ api = responder.API()
 
 @api.route("/query")
 async def query_entrypoint(req, resp):
-
+    """Validate input request, decode, execute, and returns response."""
     try:
         query = await req.media()
         log.debug(f"Raw Query JSON: {query}")
@@ -57,7 +59,7 @@ async def query_entrypoint(req, resp):
 
 
 if __name__ == "__main__":
-    log.debug("Debug On")
+    log.debug("Debugging Enabled")
     api.run(
         address=params.listen_address.compressed,
         port=params.port,

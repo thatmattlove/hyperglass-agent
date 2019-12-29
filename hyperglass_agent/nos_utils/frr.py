@@ -1,9 +1,21 @@
+"""Various Free Range Routing (FRR) utilities."""
+
 # Project Imports
 from hyperglass_agent.constants import AFI_DISPLAY_MAP
 from hyperglass_agent.util import log
 
 
 async def parse_frr_output(raw, query_data, not_found):
+    """Parse raw CLI output from FRR (vtysh) and return parsed output.
+
+    Arguments:
+        raw {str} -- Raw output from vtysh
+        query_data {object} -- Validated query object
+        not_found {str} -- Lookup not found message template
+
+    Returns:
+        {str} -- Parsed output
+    """
     raw_split = raw.strip()
     if not raw_split:
         notfound_message = not_found.format(
@@ -12,5 +24,6 @@ async def parse_frr_output(raw, query_data, not_found):
         output = notfound_message
     else:
         output = raw_split
+
     log.debug(f"Parsed output:\n{output}")
     return output

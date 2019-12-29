@@ -1,3 +1,5 @@
+"""Read YAML config file, validate, and set defaults."""
+
 # Standard Library Imports
 from pathlib import Path
 

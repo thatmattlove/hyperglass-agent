@@ -1,11 +1,19 @@
+"""Various formatting functions for supported platforms."""
+
 # Project Imports
 from hyperglass_agent.nos_utils.bird import get_bird_version
 
 
 def format_bird(ip_version, cmd, mode):
-    """
-    Prefixes the configured BIRD command with the appropriate BIRD CLI
-    command.
+    """Prefixes BIRD command with the appropriate BIRD CLI command.
+
+    Arguments:
+        ip_version {int} -- IPv4/IPv6
+        cmd {str} -- Unprefixed command
+        mode {str} -- Agent mode
+
+    Returns:
+        {str} -- Prefixed command
     """
     if mode == "bird":
         bird_version = get_bird_version()
@@ -20,4 +28,12 @@ def format_bird(ip_version, cmd, mode):
 
 
 def format_frr(cmd):
+    """Prefixes FRR command with the appropriate vtysh prefix.
+
+    Arguments:
+        cmd {str} -- Unprefixed command
+
+    Returns:
+        {str} -- Prefixed command
+    """
     return f'vtysh -uc "{cmd}"'
