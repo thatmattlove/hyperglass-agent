@@ -16,7 +16,7 @@ class HyperglassAgentError(Exception):
         Keyword Arguments:
             message {str} -- Error message (default: {""})
             code {int} -- HTTP Status Code (default: {500})
-            keywords {[type]} -- 'Important' keywords (default: {None})
+            keywords {list} -- 'Important' keywords (default: {None})
         """
         self.message = message
         self.code = code
