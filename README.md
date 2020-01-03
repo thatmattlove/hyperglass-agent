@@ -86,7 +86,7 @@ ExecStart=/home/user/.poetry/bin/poetry run python3 -m hyperglass_agent.agent
 WantedBy=multi-user.target
 ```
 
-**Note**: replace `/usr/local/bin/pipenv` with the location of your `pipenv` executable: `which pipenv`
+**Note**: replace `/home/user/.poetry/bin/poetry` with the location of your `poetry` executable: `which poetry`
 
 ## Enabling & Starting
 
