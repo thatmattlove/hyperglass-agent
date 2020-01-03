@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-LC=$(./cli.py line-count-badge)
+# LC=$(./cli.py line-count-badge)
 
-echo $LC
+# echo $LC
 
-if [[ ! $? == 0 ]]; then
-    exit 1
-fi
+# if [[ ! $? == 0 ]]; then
+#     exit 1
+# fi
 exit 0

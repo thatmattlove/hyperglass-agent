@@ -18,6 +18,7 @@ pyjwt = "^1.7.1"
 pyyaml = "^5.2"
 stackprinter = "^0.2.3"
 uvloop = "^0.14.0"
+uvicorn = "^0.11.1"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
@@ -44,10 +45,6 @@ flake8-docstrings = "^1.5.0"
 pre-commit = "^1.21.0"
 mccabe = "^0.6.1"
 
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
-
 [tool.isort]
 line_length = 88
 indent = '    '
@@ -58,3 +55,7 @@ import_heading_firstparty = "Project Imports"
 
 [tool.black]
 line-length = 88
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+

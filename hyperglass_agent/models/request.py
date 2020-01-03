@@ -1,18 +1,19 @@
 """Validate the raw JSON request data."""
 
 # Standard Library Imports
-from ipaddress import IPv4Address
-from ipaddress import IPv6Address
+from typing import Dict
 from typing import Optional
-from typing import Union
 
 # Third Party Imports
 from pydantic import BaseModel
+from pydantic import IPvAnyAddress
+from pydantic import StrictStr
 from pydantic import validator
 
 # Project Imports
 from hyperglass_agent.constants import SUPPORTED_QUERY
 from hyperglass_agent.exceptions import QueryError
+from hyperglass_agent.models._utils import StrictBytes
 
 
 class Request(BaseModel):
@@ -21,7 +22,7 @@ class Request(BaseModel):
     query_type: str
     vrf: str
     afi: str
-    source: Optional[Union[IPv4Address, IPv6Address]]
+    source: Optional[IPvAnyAddress]
     target: str
 
     @validator("query_type")
@@ -37,3 +38,9 @@ class Request(BaseModel):
         if value not in SUPPORTED_QUERY:
             raise QueryError("Query Type '{query_type}' is Invalid", query_type=value)
         return value
+
+
+class EncodedRequest(BaseModel):
+    """Validate encoded request."""
+
+    encoded: Dict[StrictStr, StrictBytes]

@@ -8,7 +8,7 @@ This repository is a **work in progress** replacement for its soon-to-be predece
 
 <div align="center">
 
-![LOC](https://raw.githubusercontent.com/checktheroads/hyperglass-agent/master/line_count.svg?sanitize=true)
+[![SCC Line Count](https://sloc.xyz/github/checktheroads/hyperglass-agent/?category=code)](https://github.com/boyter/scc/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 </div>
@@ -26,26 +26,52 @@ The hyperglass agent is a RESTful API agent for [hyperglass](https://github.com/
 
 ```bash
 sudo apt install -y python3.7-dev
-curl https://raw.githubusercontent.com/kennethreitz/pipenv/master/get-pipenv.py | python3
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 ```
 
 ## Setup
 
 ```bash
-cd /opt
-git clone https://github.com/checktheroads/hyperglass-agent
+git clone https://github.com/checktheroads/hyperglass-agent /opt/hyperglass-agent
 cd /opt/hyperglass-agent
-pipenv install
+poetry install --no-dev
 chown -R www-data:www-data /opt/hyperglass-agent
 ```
 
 # Service
 
+Any service manager can be used. Supervisor is recommended for flexibility and ease of use.
+
+## Supervisor Example
+
+### Install Supervisor
+
+```bash
+sudo apt install -y supervisor
+```
+
+### Create service
+
+Create file `/etc/supervisor/conf.d/hyperglass-agent.conf`:
+
+```ini
+[program:hyperglass-agent]
+command = poetry run python3 -m hyperglass_agent.agent
+directory = /opt/hyperglass-agent/
+user = www-data
+```
+
+### Start the service
+
+```bash
+sudo service restart supervisor
+```
+
 ## Systemd Example
 
 Create file `/etc/systemd/system/hyperglass-agent.service` with:
 
-```systemd
+```ini
 [Unit]
 Description=hyperglass-agent
 After=network.target
@@ -54,7 +80,7 @@ After=network.target
 User=www-data
 Group=www-data
 WorkingDirectory=/opt/hyperglass-agent
-ExecStart=/usr/local/bin/pipenv run python3 -m hyperglass_agent.agent
+ExecStart=/home/user/.poetry/bin/poetry run python3 -m hyperglass_agent.agent
 
 [Install]
 WantedBy=multi-user.target

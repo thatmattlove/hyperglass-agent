@@ -7,6 +7,49 @@ import re
 import pydantic
 
 
+class StrictBytes(bytes):
+    """Custom data type for a strict byte string.
+
+    Used for validatnig the encoded JWT request payload.
+    """
+
+    @classmethod
+    def __get_validators__(cls):
+        """Yield Pydantic validator function.
+
+        See: https://pydantic-docs.helpmanual.io/usage/types/#custom-data-types
+
+        Yields:
+            {function} -- Validator
+        """
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, value):
+        """Validate type.
+
+        Arguments:
+            value {Any} -- Pre-validated input
+
+        Raises:
+            TypeError: Raised if value is not bytes
+
+        Returns:
+            {object} -- Instantiated class
+        """
+        if not isinstance(value, bytes):
+            raise TypeError("bytes required")
+        return cls()
+
+    def __repr__(self):
+        """Return representation of object.
+
+        Returns:
+            {str} -- Representation
+        """
+        return f"StrictBytes({super().__repr__()})"
+
+
 def clean_name(_name):
     """Remove unsupported characters from field names.
 
@@ -25,7 +68,7 @@ def clean_name(_name):
     return _scrubbed.lower()
 
 
-class HyperglassModel(pydantic.BaseSettings):
+class HyperglassModel(pydantic.BaseModel):
     """Base model for all hyperglass configuration models."""
 
     pass
