@@ -235,9 +235,13 @@ def dev_server(host, port):
         click.ClickException: Any raised exception message
     """
     try:
-        from hyperglass_agent.agent import api
+        import uvicorn
+        from hyperglass_agent.agent import api, API_PARAMS
 
-        api.run(address=host, port=port, debug=True, log_level="debug")
+        API_PARAMS["debug"] = True
+        API_PARAMS["log_level"] = "debug"
+
+        uvicorn.run(api, **API_PARAMS)
     except Exception as e:
         raise click.ClickException(click.style(str(e), fg="red", bold=True))
 

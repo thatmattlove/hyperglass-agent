@@ -2,10 +2,14 @@
 
 # Standard Library Imports
 import sys
+from pathlib import Path
 
 SUPPORTED_NOS = ("frr", "bird")
 
 DEFAULT_MODE = "frr"
+
+CERT_PATH = Path(__file__).parent / "agent_cert.pem"
+KEY_PATH = Path(__file__).parent / "agent_key.pem"
 
 SUPPORTED_QUERY = ("bgp_route", "bgp_aspath", "bgp_community", "ping", "traceroute")
 

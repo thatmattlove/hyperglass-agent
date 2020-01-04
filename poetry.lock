@@ -806,6 +806,14 @@ version = "1.4.0"
 
 [[package]]
 category = "main"
+description = "Ultra fast JSON encoder and decoder for Python"
+name = "ujson"
+optional = false
+python-versions = "*"
+version = "1.35"
+
+[[package]]
+category = "main"
 description = "The lightning-fast ASGI server."
 name = "uvicorn"
 optional = false
@@ -876,7 +884,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "ea261b71993f4f02055487c2d488fbc9456396b2c2cc85ef868e0e87a5fd7021"
+content-hash = "35de301a8943a1561e9694192f72982e2aa5044af3d0dba06b9cc7f721498399"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1276,6 +1284,9 @@ typed-ast = [
     {file = "typed_ast-1.4.0-cp38-cp38-win32.whl", hash = "sha256:1170afa46a3799e18b4c977777ce137bb53c7485379d9706af8a59f2ea1aa161"},
     {file = "typed_ast-1.4.0-cp38-cp38-win_amd64.whl", hash = "sha256:838997f4310012cf2e1ad3803bce2f3402e9ffb71ded61b5ee22617b3a7f6b6e"},
     {file = "typed_ast-1.4.0.tar.gz", hash = "sha256:66480f95b8167c9c5c5c87f32cf437d585937970f3fc24386f313a4c97b44e34"},
+]
+ujson = [
+    {file = "ujson-1.35.tar.gz", hash = "sha256:f66073e5506e91d204ab0c614a148d5aa938bdbf104751be66f8ad7a222f5f86"},
 ]
 uvicorn = [
     {file = "uvicorn-0.11.1-py3-none-any.whl", hash = "sha256:d07129d98440ef69e4fd3aaebf16ab9b96cbcdffd813b9889bf8ec001351f4b8"},

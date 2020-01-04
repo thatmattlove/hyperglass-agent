@@ -25,8 +25,9 @@ The hyperglass agent is a RESTful API agent for [hyperglass](https://github.com/
 ## System Requirements
 
 ```bash
-sudo apt install -y python3.7-dev
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+sudo apt install -y python3.7-dev python3-venv
+curl https://pyenv.run | bash
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
 ```
 
 ## Setup
@@ -37,6 +38,22 @@ cd /opt/hyperglass-agent
 poetry install --no-dev
 chown -R www-data:www-data /opt/hyperglass-agent
 ```
+
+### 'Cannot uninstall 'PyYAML' Error
+
+Some systems may produce the following error when running `poetry install`:
+
+```
+ERROR: Cannot uninstall 'PyYAML'. It is a distutils installed project and thus we cannot accurately determine which files belong to it which would lead to only a partial uninstall.
+```
+
+You can reference [this issue](https://github.com/pypa/pip/issues/4805) or [this Stack Overflow](https://stackoverflow.com/questions/49911550/how-to-upgrade-disutils-package-pyyaml) article on the topic, but this is "easily" fixed by running:
+
+```bash
+sudo rm -rf /usr/lib/python3/dist-packages/yaml /usr/lib/python3/dist-packages/PyYAML-*
+```
+
+And then run `poetry install` again.
 
 # Service
 
