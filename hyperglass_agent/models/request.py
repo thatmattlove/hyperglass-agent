@@ -1,8 +1,8 @@
 """Validate the raw JSON request data."""
 
 # Standard Library Imports
-from typing import Dict
 from typing import Optional
+from typing import Union
 
 # Third Party Imports
 from pydantic import BaseModel
@@ -43,4 +43,4 @@ class Request(BaseModel):
 class EncodedRequest(BaseModel):
     """Validate encoded request."""
 
-    encoded: Dict[StrictStr, StrictBytes]
+    encoded: Union[StrictStr, StrictBytes]

@@ -1,7 +1,7 @@
 """Module specific exception classes."""
 
-# Standard Library Imports
-import json as _json
+# Third Party Imports
+import ujson as _json
 
 # Project Imports
 from hyperglass_agent.util import log
@@ -18,9 +18,9 @@ class HyperglassAgentError(Exception):
             code {int} -- HTTP Status Code (default: {500})
             keywords {list} -- 'Important' keywords (default: {None})
         """
-        self.message = message
-        self.code = code
-        self.keywords = keywords or []
+        self._message = message
+        self._code = code
+        self._keywords = keywords or []
         log.critical(self.__repr__())
 
     def __str__(self):
@@ -29,7 +29,7 @@ class HyperglassAgentError(Exception):
         Returns:
             {str} -- Error Message
         """
-        return self.message
+        return self._message
 
     def __repr__(self):
         """Return the instance's code & error message in a string.
@@ -37,7 +37,7 @@ class HyperglassAgentError(Exception):
         Returns:
             {str} -- Error message with code
         """
-        return f"{self.code}: {self.message}"
+        return f"{self._code}: {self._message}"
 
     def __dict__(self):
         """Return the instance's attributes as a dictionary.
@@ -45,7 +45,11 @@ class HyperglassAgentError(Exception):
         Returns:
             {dict} -- Exception attributes in dict
         """
-        return {"message": self.message, "code": self.code, "keywords": self.keywords}
+        return {
+            "message": self._message,
+            "code": self._code,
+            "keywords": self._keywords,
+        }
 
     def json(self):
         """Return the instance's attributes as a JSON object.
@@ -54,7 +58,7 @@ class HyperglassAgentError(Exception):
             {str} -- Exception attributes as JSON
         """
         return _json.dumps(
-            {"message": self.message, "code": self.code, "keywords": self.keywords}
+            {"message": self._message, "code": self._code, "keywords": self._keywords}
         )
 
     @property
@@ -64,7 +68,7 @@ class HyperglassAgentError(Exception):
         Returns:
             {int} -- HTTP Status Code
         """
-        return self.code
+        return self._code
 
     @property
     def message(self):
@@ -73,7 +77,7 @@ class HyperglassAgentError(Exception):
         Returns:
             {str} -- Error Message
         """
-        return self.message
+        return self._message
 
     @property
     def keywords(self):
@@ -82,7 +86,7 @@ class HyperglassAgentError(Exception):
         Returns:
             {list} -- Keywords List
         """
-        return self.keywords
+        return self._keywords
 
 
 class ConfigInvalid(HyperglassAgentError):
@@ -90,37 +94,51 @@ class ConfigInvalid(HyperglassAgentError):
 
     def __init__(self, **kwargs):
         """Format a pre-defined message with passed keyword arguments."""
-        self.message = 'The value field "{field}" is invalid: {error_msg}'.format(
+        self._message = 'The value field "{field}" is invalid: {error_msg}'.format(
             **kwargs
         )
-        self.keywords = list(kwargs.values())
-        super().__init__(message=self.message, keywords=self.keywords)
+        self._keywords = list(kwargs.values())
+        super().__init__(message=self._message, keywords=self._keywords)
 
 
-class _FmtHyperglassAgentError(HyperglassAgentError):
-    def __init__(self, unformatted_msg, **kwargs):
-        self.message = unformatted_msg.format(**kwargs)
-        self.keywords = list(kwargs.values())
-        super().__init__(message=self.message, keywords=self.keywords)
+class _UnformattedHyperglassError(HyperglassAgentError):
+    """Base exception class for freeform error messages."""
+
+    _code = 500
+
+    def __init__(self, unformatted_msg="undefined error", code=None, **kwargs):
+        """Format error message with keyword arguments.
+
+        Keyword Arguments:
+            message {str} -- Error message (default: {""})
+            alert {str} -- Error severity (default: {"warning"})
+            keywords {list} -- 'Important' keywords (default: {None})
+        """
+        self._message = unformatted_msg.format(**kwargs)
+        self._alert = code or self._code
+        self._keywords = list(kwargs.values())
+        super().__init__(
+            message=self._message, code=self._code, keywords=self._keywords
+        )
 
 
-class ConfigError(_FmtHyperglassAgentError):
+class ConfigError(_UnformattedHyperglassError):
     """Raised for generic user-config issues."""
 
 
-class QueryError(_FmtHyperglassAgentError):
+class QueryError(_UnformattedHyperglassError):
     """Raised when a received query is invalid according to the query model."""
 
-    code = 400
+    _code = 400
 
 
-class ExecutionError(_FmtHyperglassAgentError):
+class ExecutionError(_UnformattedHyperglassError):
     """Raised when an error occurs during shell command execution."""
 
-    code = 503
+    _code = 503
 
 
-class SecurityError(_FmtHyperglassAgentError):
+class SecurityError(_UnformattedHyperglassError):
     """Raised when a JWT decoding error occurs."""
 
-    code = 500
+    _code = 500

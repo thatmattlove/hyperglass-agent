@@ -100,7 +100,7 @@ async def query_entrypoint(query: EncodedRequest):
         raise RequestValidationError(str(err_validation))
 
     except HyperglassAgentError as err_agent:
-        raise HTTPException(status_code=err_agent.status, detail=str(err_agent))
+        raise HTTPException(status_code=err_agent.code, detail=str(err_agent))
 
 
 def start():
