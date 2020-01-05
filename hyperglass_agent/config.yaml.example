@@ -1,9 +1,16 @@
-debug: true
-listen_address: "0.0.0.0"
-# port: 8080
-mode: frr # frr|bird
-# secret: dont4get
-secret: TestSecret12345
+# debug: boolean
+# listen_address: string (IP Address)
+# port: integer
+# mode: string (frr|bird)
+# secret: string
+# valid_duration: integer
+# not_found_message: string
+#
+# ssl:
+#     enable: boolean
+#     cert: string|file
+#     key: string|file
+#
 # commands:
 #   frr:
 #     ipv4_default:
