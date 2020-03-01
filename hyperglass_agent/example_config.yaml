@@ -1,0 +1,9 @@
+# debug: false
+# mode: frr
+# listen_address: '::1'
+# port: 8443
+# valid_duration: 60
+# not_found_message: "{target} not found. ({afi})"
+secret: null
+ssl:
+  enable: true
