@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hyperglass-agent"
-version = "0.1.1"
+version = "0.1.2"
 description = "The Linux Routing Agent for hyperglass"
 authors = ["Matt Love <matt@hyperglass.io>"]
 readme = "README.md"
@@ -50,7 +50,7 @@ pre-commit = "^1.21.0"
 mccabe = "^0.6.1"
 
 [tool.poetry.scripts]
-hyperglass-agent = "hyperglass-agent.console:cli"
+hyperglass-agent = "hyperglass_agent.console:cli"
 
 [tool.black]
 line-length = 88
