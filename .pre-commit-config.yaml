@@ -5,7 +5,7 @@ repos:
       - id: flake8
   - repo: local
     hooks:
-      - id: line_count
-        name: Line Count
+      - id: scripts
+        name: Commit Scripts
         entry: hooks.sh
         language: script

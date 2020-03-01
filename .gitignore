@@ -1,6 +1,7 @@
 .DS_Store
 .vscode*
 test.py
+.python-version
 __pycache__/
 *.py[cod]
 *$py.class
