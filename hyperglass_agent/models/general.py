@@ -1,23 +1,28 @@
 """Validate application config parameters."""
-
+# Standard Library
+import os
 from typing import Optional
+from pathlib import Path
 
+# Third Party
 # Third Party Imports
-from pydantic import FilePath
-from pydantic import IPvAnyAddress
-from pydantic import SecretStr
-from pydantic import StrictBool
-from pydantic import StrictInt
-from pydantic import StrictStr
-from pydantic import validator
+from pydantic import (
+    FilePath,
+    SecretStr,
+    StrictInt,
+    StrictStr,
+    StrictBool,
+    IPvAnyAddress,
+    validator,
+)
 
+# Project
 # Project Imports
-from hyperglass_agent.constants import CERT_PATH
-from hyperglass_agent.constants import DEFAULT_MODE
-from hyperglass_agent.constants import KEY_PATH
-from hyperglass_agent.constants import SUPPORTED_NOS
+from hyperglass_agent.constants import DEFAULT_MODE, SUPPORTED_NOS
 from hyperglass_agent.exceptions import ConfigError
 from hyperglass_agent.models._utils import HyperglassModel
+
+APP_PATH = Path(os.environ["hyperglass_agent_directory"])
 
 
 class Ssl(HyperglassModel):
@@ -38,10 +43,11 @@ class Ssl(HyperglassModel):
         Returns:
             {Path} -- Path to cert file
         """
+        cert_path = APP_PATH / "agent_cert.pem"
         if values["enable"] and value is None:
-            if not CERT_PATH.exists():
-                raise ValueError(f"{str(CERT_PATH)} does not exist.")
-            value = CERT_PATH
+            if not cert_path.exists():
+                raise ValueError(f"{str(cert_path)} does not exist.")
+            value = cert_path
         return value
 
     @validator("key")
@@ -55,10 +61,12 @@ class Ssl(HyperglassModel):
         Returns:
             {Path} -- Path to key file
         """
+        key_path = APP_PATH / "agent_key.pem"
+
         if values["enable"] and value is None:
-            if not KEY_PATH.exists():
-                raise ValueError(f"{str(KEY_PATH)} does not exist.")
-            value = KEY_PATH
+            if not key_path.exists():
+                raise ValueError(f"{str(key_path)} does not exist.")
+            value = key_path
         return value
 
 

@@ -1,16 +1,12 @@
 """Validate the raw JSON request data."""
 
-# Standard Library Imports
-from typing import Optional
-from typing import Union
+# Standard Library
+from typing import Union, Optional
 
-# Third Party Imports
-from pydantic import BaseModel
-from pydantic import IPvAnyAddress
-from pydantic import StrictStr
-from pydantic import validator
+# Third Party
+from pydantic import BaseModel, StrictStr, IPvAnyAddress, validator
 
-# Project Imports
+# Project
 from hyperglass_agent.constants import SUPPORTED_QUERY
 from hyperglass_agent.exceptions import QueryError
 from hyperglass_agent.models._utils import StrictBytes

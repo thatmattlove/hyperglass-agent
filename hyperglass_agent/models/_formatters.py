@@ -1,6 +1,6 @@
 """Various formatting functions for supported platforms."""
 
-# Project Imports
+# Project
 from hyperglass_agent.nos_utils.bird import get_bird_version
 
 

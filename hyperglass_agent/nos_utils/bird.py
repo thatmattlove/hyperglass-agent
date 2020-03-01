@@ -1,14 +1,13 @@
 """Various BIRD Internet Routing Daemon (BIRD) utilities."""
 
-# Standard Library Imports
-import asyncio
+# Standard Library
 import re
+import asyncio
 
-# Project Imports
+# Project
+from hyperglass_agent.util import log, top_level_async
 from hyperglass_agent.constants import AFI_DISPLAY_MAP
 from hyperglass_agent.exceptions import ExecutionError
-from hyperglass_agent.util import log
-from hyperglass_agent.util import top_level_async
 
 
 @top_level_async

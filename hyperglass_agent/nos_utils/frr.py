@@ -1,8 +1,8 @@
 """Various Free Range Routing (FRR) utilities."""
 
-# Project Imports
-from hyperglass_agent.constants import AFI_DISPLAY_MAP
+# Project
 from hyperglass_agent.util import log
+from hyperglass_agent.constants import AFI_DISPLAY_MAP
 
 
 async def parse_frr_output(raw, query_data, not_found):

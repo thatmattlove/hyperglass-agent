@@ -1,14 +1,12 @@
 """Command definitions for supported platforms."""
 
-# Third Party Imports
+# Third Party
 from pydantic import validator
 
-# Project Imports
-from hyperglass_agent.constants import AGENT_QUERY
-from hyperglass_agent.constants import DEFAULT_MODE
-from hyperglass_agent.models._formatters import format_bird
-from hyperglass_agent.models._formatters import format_frr
+# Project
+from hyperglass_agent.constants import AGENT_QUERY, DEFAULT_MODE
 from hyperglass_agent.models._utils import HyperglassModel
+from hyperglass_agent.models._formatters import format_frr, format_bird
 
 
 class Command(HyperglassModel):

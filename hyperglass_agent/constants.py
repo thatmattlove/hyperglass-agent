@@ -1,6 +1,6 @@
 """Constant definitions used throughout the application."""
 
-# Standard Library Imports
+# Standard Library
 import sys
 from pathlib import Path
 
@@ -8,8 +8,7 @@ SUPPORTED_NOS = ("frr", "bird")
 
 DEFAULT_MODE = "frr"
 
-CERT_PATH = Path(__file__).parent / "agent_cert.pem"
-KEY_PATH = Path(__file__).parent / "agent_key.pem"
+APP_PATHS = (Path.home() / "hyperglass-agent", Path("/etc/hyperglass-agent"))
 
 SUPPORTED_QUERY = ("bgp_route", "bgp_aspath", "bgp_community", "ping", "traceroute")
 

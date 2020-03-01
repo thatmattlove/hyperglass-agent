@@ -1,29 +1,34 @@
 """Read YAML config file, validate, and set defaults."""
 
-# Standard Library Imports
-import asyncio
+# Standard Library
+import os
 from pathlib import Path
 
-# Third Party Imports
+# Third Party
 import yaml
-from aiofile import AIOFile
 from pydantic import ValidationError
 
-# Project Imports
-from hyperglass_agent.constants import LOG_HANDLER
-from hyperglass_agent.constants import LOG_LEVELS
-from hyperglass_agent.exceptions import ConfigError
-from hyperglass_agent.exceptions import ConfigInvalid
-from hyperglass_agent.models.commands import Commands
+# Project
+from hyperglass_agent.util import log, set_app_path
+from hyperglass_agent.constants import LOG_LEVELS, LOG_HANDLER
+from hyperglass_agent.exceptions import ConfigError, ConfigInvalid
 from hyperglass_agent.models.general import General
-from hyperglass_agent.util import log
+from hyperglass_agent.models.commands import Commands
 
-WORKING_DIR = Path(__file__).resolve().parent
+if os.environ.get("hyperglass_agent_directory") is None:
+    set_app_path(required=True)
 
-CONFIG_FILE = WORKING_DIR / "config.yaml"
+try:
+    APP_PATH = Path(os.environ["hyperglass_agent_directory"])
+except KeyError:
+    raise ConfigError(
+        "No application path was found. Please consult the setup documentation."
+    )
+
+CONFIG_FILE = APP_PATH / "config.yaml"
 
 
-async def get_config():
+def _get_config():
     """Read config file & load YAML to dict.
 
     Raises:
@@ -34,8 +39,8 @@ async def get_config():
         {dict} -- Loaded config
     """
     try:
-        async with AIOFile(CONFIG_FILE, "r") as file:
-            config_file = await file.read()
+        with CONFIG_FILE.open("r") as file:
+            config_file = file.read()
             raw_config = yaml.safe_load(config_file)
 
     except FileNotFoundError:
@@ -46,37 +51,35 @@ async def get_config():
     return raw_config
 
 
-raw_config = asyncio.run(get_config())
+_raw_config = _get_config()
 
 try:
-    raw_config_commands = raw_config.pop("commands", None)
-    user_config = General(**raw_config)
+    _commands = _raw_config.pop("commands", None)
+    _user_config = General(**_raw_config)
 
-    if raw_config_commands is not None:
-        user_commands = Commands.import_params(
-            mode=user_config.mode, **raw_config_commands
-        )
+    if _commands is not None:
+        _user_commands = Commands.import_params(mode=_user_config.mode, **_commands)
     else:
-        user_commands = Commands.import_params(mode=user_config.mode)
+        _user_commands = Commands.import_params(mode=_user_config.mode)
 
 except ValidationError as validation_errors:
-    errors = validation_errors.errors()
-    for error in errors:
+    _errors = validation_errors.errors()
+    for error in _errors:
         raise ConfigInvalid(
             field=": ".join([str(item) for item in error["loc"]]),
             error_msg=error["msg"],
         )
 
 LOG_LEVEL = "INFO"
-if user_config.debug:
+if _user_config.debug:
     LOG_LEVEL = "DEBUG"
     LOG_HANDLER["level"] = LOG_LEVEL
     log.remove()
     log.configure(handlers=[LOG_HANDLER], levels=LOG_LEVELS)
     log.debug("Debugging Enabled")
 
-params = user_config
-commands = user_commands
+params = _user_config
+commands = _user_commands
 
 log.debug(params.json())
 log.debug(commands.json())

@@ -1,16 +1,15 @@
 """Construct, execute, parse, and return the requested query."""
 
-# Standard Library Imports
+# Standard Library
 import asyncio
 import operator
 
-# Project Imports
-from hyperglass_agent.config import commands
-from hyperglass_agent.config import params
-from hyperglass_agent.exceptions import ExecutionError
-from hyperglass_agent.nos_utils.bird import parse_bird_output
-from hyperglass_agent.nos_utils.frr import parse_frr_output
+# Project
 from hyperglass_agent.util import log
+from hyperglass_agent.config import params, commands
+from hyperglass_agent.exceptions import ExecutionError
+from hyperglass_agent.nos_utils.frr import parse_frr_output
+from hyperglass_agent.nos_utils.bird import parse_bird_output
 
 
 async def run_query(query):

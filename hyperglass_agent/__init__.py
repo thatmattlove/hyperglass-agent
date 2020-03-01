@@ -4,7 +4,7 @@ https://github.com/checktheroads/hyperglass-agent
 
 The Clear BSD License
 
-Copyright (c) 2019 Matthew Love
+Copyright (c) 2020 Matthew Love
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,12 +36,17 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-# Third Party Imports
-import stackprinter
+# Third Party
 import uvloop
+import stackprinter
+
+# Project
+from hyperglass_agent.util import set_app_path
 
 stackprinter.set_excepthook()
 uvloop.install()
+
+set_app_path(required=False)
 
 __name__ = "hyperglass_agent"
 __title__ = "Hyperglass Agent"

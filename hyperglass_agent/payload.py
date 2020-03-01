@@ -1,11 +1,14 @@
 """Handle JSON Web Token Encoding & Decoding."""
 
+# Standard Library
 # Standard Library Imports
 import datetime
 
+# Third Party
 # Third Party Imports
 import jwt
 
+# Project
 # Project Imports
 from hyperglass_agent.config import params
 from hyperglass_agent.exceptions import SecurityError
