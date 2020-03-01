@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hyperglass-agent"
-version = "0.1.0"
+version = "0.1.1"
 description = "The Linux Routing Agent for hyperglass"
 authors = ["Matt Love <matt@hyperglass.io>"]
 readme = "README.md"
