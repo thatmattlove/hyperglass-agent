@@ -120,8 +120,8 @@ def find_app_path():
     from hyperglass_agent.util import set_app_path
     from hyperglass_agent.constants import APP_PATHS
 
-    set_app_path(required=True)
     try:
+        set_app_path(required=True)
         app_path = Path(os.environ["hyperglass_agent_directory"])
     except RuntimeError:
         warning(
