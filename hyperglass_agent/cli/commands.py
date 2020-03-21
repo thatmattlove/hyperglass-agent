@@ -130,6 +130,14 @@ def gen_cert(name, org, duration, size, show, get):
         write_cert(name=name, org=org, duration=duration, size=size, show=show)
 
 
+@cli.command("send-certificate", help="Send this device's public key to hyperglass")
+def send_certificate():
+    """Send this device's public key to hyperglass."""
+    from hyperglass_agent.cli.actions import send_cert
+
+    send_cert()
+
+
 @cli.command("start", help="Start the Web Server")
 def start_server():
     """Start the hyperglass agent."""
@@ -139,13 +147,38 @@ def start_server():
 
 
 @cli.command("setup", help="Run the setup wizard")
-@option("--config/--no-config", default=True, help="Don't regenerate config file")
-@option("--certs/--no-certs", default=True, help="Don't regenerate certificates")
-@option("--systemd/--no-systemd", default=True, help="Don't generate a systemd file")
+@option(
+    "--no-config",
+    "config",
+    is_flag=True,
+    default=False,
+    help="Don't regenerate config file",
+)
+@option(
+    "--no-certs",
+    "certs",
+    is_flag=True,
+    default=False,
+    help="Don't regenerate certificates",
+)
+@option(
+    "--no-systemd",
+    "systemd",
+    is_flag=True,
+    default=False,
+    help="Don't generate a systemd file",
+)
+@option(
+    "--no-send",
+    "send",
+    is_flag=True,
+    default=False,
+    help="Don't send the SSL certificate to hyperglass",
+)
 @option(
     "--force", is_flag=True, default=False, help="Force regeneration of config file"
 )
-def run_setup(config, certs, force, systemd):
+def run_setup(config, certs, systemd, send, force):
     """Run setup wizard.
 
     Checks/creates installation directory, generates and writes
@@ -156,11 +189,12 @@ def run_setup(config, certs, force, systemd):
         migrate_config,
         write_cert,
         make_systemd,
+        send_cert,
     )
 
     find_app_path()
 
-    if certs:
+    if not certs:
         write_cert(
             name=DEFAULT_CERT_CN,
             org=DEFAULT_CERT_O,
@@ -169,8 +203,11 @@ def run_setup(config, certs, force, systemd):
             show=DEFAULT_CERT_SHOW,
         )
 
-    if config:
+    if not config:
         migrate_config(force)
 
-    if systemd:
+    if not systemd:
         make_systemd()
+
+    if not send:
+        send_cert()

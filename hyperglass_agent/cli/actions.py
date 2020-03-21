@@ -6,34 +6,11 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 # Third Party
-import jwt
-from click import echo, style, confirm
+from click import echo, style, prompt, confirm
 
 # Project
 from hyperglass_agent.cli.echo import info, error, success, warning
 from hyperglass_agent.cli.static import CL, NL, WS, WARNING, E
-
-
-async def decode(payload, secret):
-    """Decode JWT payloads."""
-    try:
-        decoded = jwt.decode(payload, secret, algorithm="HS256")
-        decoded = decoded["payload"]
-        return decoded
-    except (KeyError, jwt.ExpiredSignature, jwt.ExpiredSignatureError) as exp:
-        raise RuntimeError(str(exp))
-
-
-async def encode(response, secret):
-    """Encode JWT responses."""
-    payload = {
-        "payload": response,
-        "nbf": datetime.utcnow(),
-        "iat": datetime.utcnow(),
-        "exp": datetime.utcnow() + timedelta(seconds=60),
-    }
-    encoded = jwt.encode(payload, secret, algorithm="HS256")
-    return encoded
 
 
 def create_dir(path, **kwargs):
@@ -233,6 +210,64 @@ def write_cert(name, org, duration, size, show):
         error("Error writing private key to {f}", f=key_path.absolute())
 
     success("Wrote private key to: {f}", f=key_path.absolute())
+
+
+def send_cert():
+    """Send this device's public key to hyperglass."""
+
+    import platform
+    from hyperglass_agent.config import params
+    from hyperglass_agent.util import send_public_key
+    from pydantic import AnyHttpUrl, create_model, ValidationError
+
+    app_path = find_app_path()
+    cert_file = app_path / "agent_cert.pem"
+
+    if params.ssl is not None and not params.ssl.enable:
+        confirm(
+            "SSL is disabled. Proceed with sending certificate to hyperglass?",
+            default=False,
+            abort=True,
+        )
+
+    if not cert_file.exists():
+        error("File {f} does not exist", f=cert_file)
+
+    with cert_file.open("r") as f:
+        cert = f.read().strip()
+
+    _hg_url = prompt("Enter hyperglass URL (e.g. https://lg.example.com)", type=str)
+
+    url_model = create_model("UrlModel", url=(AnyHttpUrl, ...))
+
+    try:
+        hg_url = url_model(url=_hg_url)
+    except ValidationError as ve:
+        msg = ve.errors()[0]["msg"]
+        warning("URL {u} is invalid: {e}", u=_hg_url, e=msg)
+        _hg_url = prompt("Enter hyperglass URL (e.g. https://lg.example.com)", type=str)
+        try:
+            hg_url = url_model(url=_hg_url)
+        except ValidationError as ve:
+            msg = ve.errors()[0]["msg"]
+            error("URL {u} is invalid: {e}", u=_hg_url, e=msg)
+
+    device_name = platform.node()
+    keep_discovered = confirm(
+        f"This device's hostname appears to be '{device_name}'. "
+        + "Does this match this device's definition in hyperglass?"
+    )
+
+    if not keep_discovered:
+        device_name = prompt("Enter the device's name as configured in hyperglass")
+
+    try:
+        status = send_public_key(
+            str(hg_url.url), device_name=device_name, certificate=cert, params=params
+        )
+        success(status)
+    except RuntimeError as re:
+        error(str(re))
 
 
 def install_systemd(service_path):

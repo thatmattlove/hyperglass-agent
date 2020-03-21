@@ -100,3 +100,44 @@ def set_app_path(required=False):
         os.environ["hyperglass_agent_directory"] = str(matched_path)
 
     return True
+
+
+def send_public_key(hyperglass_url, device_name, certificate, params):
+    """Send this device's public key to hyperglass.
+
+    Arguments:
+        hyperglass_url {str} -- URL to hyperglass
+        device_name {str} -- This device's hostname
+        certificate {str} -- Public key string
+        params {object} -- Configuration object
+
+    Returns:
+        {str} -- Response
+    """
+    import httpx
+    from hyperglass_agent.payload import _jwt_encode as jwt_encode
+    from json import JSONDecodeError
+
+    payload = jwt_encode(certificate.strip())
+
+    hyperglass_url = hyperglass_url.rstrip("/")
+
+    try:
+        response = httpx.post(
+            hyperglass_url + "/api/import-agent-certificate/",
+            json={"device": device_name, "encoded": payload},
+        )
+    except httpx.HTTPError as http_error:
+        raise RuntimeError(str(http_error))
+    try:
+        data = response.json()
+
+        if response.status_code != 200:
+            raise RuntimeError(data.get("output", "An error occurred"))
+
+        return data.get("output", "An error occurred")
+
+    except JSONDecodeError:
+        if response.status_code != 200:
+            raise RuntimeError(response.text)
+        return response.text
