@@ -289,6 +289,9 @@ def install_systemd(service_path):
     if not systemd.exists():
         error("{e} does not exist. Unable to install systemd service.", e=systemd)
 
+    if installed.is_symlink():
+        installed.unlink()
+
     installed.symlink_to(service_path)
 
     if not installed.exists():
@@ -341,6 +344,9 @@ WantedBy=multi-user.target
     systemd = template.format(user=user, group=user, bin_path=bin_path)
 
     info(f"Generated systemd service:\n{systemd}")
+
+    if service_path.exists():
+        service_path.unlink()
 
     with service_path.open("w") as f:
         f.write(systemd)
