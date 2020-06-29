@@ -67,7 +67,7 @@ async def parse_bird_output(raw, query_data, not_found):
         str -- Parsed output
     """
     raw_split = re.split(r"(Table)", raw.strip())
-    raw_joined = "".join(raw_split[1::])
+    raw_joined = "".join(raw_split[0::])
 
     if not raw_joined:
         notfound_message = not_found.format(

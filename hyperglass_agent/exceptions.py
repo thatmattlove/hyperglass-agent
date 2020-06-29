@@ -1,12 +1,10 @@
 """Module specific exception classes."""
 
-# Third Party
-# Third Party Imports
-import ujson as _json
+# Standard Library
+import json as _json
 
 # Project
-# Project Imports
-from hyperglass_agent.util import log
+from hyperglass_agent.log import log
 
 
 class HyperglassAgentError(Exception):
@@ -132,6 +130,12 @@ class QueryError(_UnformattedHyperglassError):
     """Raised when a received query is invalid according to the query model."""
 
     _code = 400
+
+
+class ResponseEmpty(_UnformattedHyperglassError):
+    """Raised when a received query is valid, but the response is empty."""
+
+    _code = 204
 
 
 class ExecutionError(_UnformattedHyperglassError):

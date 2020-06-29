@@ -1,7 +1,7 @@
 """Various Free Range Routing (FRR) utilities."""
 
 # Project
-from hyperglass_agent.util import log
+from hyperglass_agent.log import log
 from hyperglass_agent.constants import AFI_DISPLAY_MAP
 
 

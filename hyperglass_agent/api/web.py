@@ -1,7 +1,9 @@
 """Web server frontend, passes raw query to backend validation & execution."""
 
+# Standard Library
+import json
+
 # Third Party
-import ujson as json
 from fastapi import FastAPI, HTTPException
 from pydantic import ValidationError
 from fastapi.exceptions import RequestValidationError
@@ -10,8 +12,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # Project
 from hyperglass_agent import __title__, __version__, __description__
-from hyperglass_agent.util import log
-from hyperglass_agent.config import APP_PATH, LOG_LEVEL, params
+from hyperglass_agent.log import log
+from hyperglass_agent.config import APP_PATH, params
 from hyperglass_agent.execute import run_query
 from hyperglass_agent.payload import jwt_decode, jwt_encode
 from hyperglass_agent.exceptions import HyperglassAgentError
@@ -20,17 +22,18 @@ from hyperglass_agent.models.request import Request, EncodedRequest
 CERT_PATH = APP_PATH / "agent_cert.pem"
 KEY_PATH = APP_PATH / "agent_key.pem"
 
-API_BASE_PARAMS = {
+
+API_PARAMS = {
     "host": params.listen_address.compressed,
     "port": params.port,
-    "log_level": LOG_LEVEL.lower(),
     "debug": params.debug,
 }
 
 if params.ssl.enable:
-    API_BASE_PARAMS.update({"ssl_certfile": CERT_PATH, "ssl_keyfile": KEY_PATH})
+    API_PARAMS.update({"ssl_certfile": CERT_PATH, "ssl_keyfile": KEY_PATH})
 
-API_PARAMS = API_BASE_PARAMS
+if params.debug:
+    API_PARAMS.update({"log_level": "debug"})
 
 api = FastAPI(
     title=__title__,

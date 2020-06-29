@@ -3,16 +3,8 @@
 # Standard Library
 import os
 
-# Third Party
-from loguru import logger as _loguru_logger
-
 # Project
-from hyperglass_agent.constants import APP_PATHS, LOG_LEVELS, LOG_HANDLER
-
-_loguru_logger.remove()
-_loguru_logger.configure(handlers=[LOG_HANDLER], levels=LOG_LEVELS)
-
-log = _loguru_logger
+from hyperglass_agent.constants import APP_PATHS
 
 
 def top_level_async(func):

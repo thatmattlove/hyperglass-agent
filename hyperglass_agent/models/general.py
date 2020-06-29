@@ -1,28 +1,31 @@
 """Validate application config parameters."""
+
 # Standard Library
 import os
-from typing import Optional
+from typing import Union, Optional
 from pathlib import Path
 
 # Third Party
-# Third Party Imports
 from pydantic import (
+    ByteSize,
     FilePath,
     SecretStr,
     StrictInt,
     StrictStr,
     StrictBool,
+    DirectoryPath,
     IPvAnyAddress,
+    constr,
     validator,
 )
 
 # Project
-# Project Imports
 from hyperglass_agent.constants import DEFAULT_MODE, SUPPORTED_NOS
 from hyperglass_agent.exceptions import ConfigError
 from hyperglass_agent.models._utils import HyperglassModel
 
 APP_PATH = Path(os.environ["hyperglass_agent_directory"])
+DEFAULT_LOG_DIR = Path("/tmp/")  # noqa: S108
 
 
 class Ssl(HyperglassModel):
@@ -70,12 +73,28 @@ class Ssl(HyperglassModel):
         return value
 
 
+class Logging(HyperglassModel):
+    """Logging configuration."""
+
+    directory: Union[DirectoryPath, StrictBool] = DEFAULT_LOG_DIR
+    format: constr(regex=r"(text|json)") = "text"
+    max_size: ByteSize = "50MB"
+
+    @validator("directory")
+    def validate_directory(cls, value):
+        """Require the only boolean value to be false."""
+        if value is True:
+            value = DEFAULT_LOG_DIR
+        return value
+
+
 class General(HyperglassModel):
     """Validate config parameters."""
 
     debug: StrictBool = False
     listen_address: IPvAnyAddress = "0.0.0.0"  # noqa: S104
     ssl: Ssl = Ssl()
+    logging: Logging = Logging()
     port: StrictInt = None
     mode: StrictStr = DEFAULT_MODE
     secret: SecretStr
