@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hyperglass-agent"
-version = "0.1.4"
+version = "0.1.5"
 description = "The Linux Routing Agent for hyperglass"
 authors = ["Matt Love <matt@hyperglass.io>"]
 readme = "README.md"
@@ -21,7 +21,6 @@ pyyaml = "^5.2"
 stackprinter = "^0.2.3"
 uvloop = "^0.14.0"
 uvicorn = "^0.11.1"
-ujson = "^1.35"
 inquirer = "^2.6.3"
 
 [tool.poetry.dev-dependencies]

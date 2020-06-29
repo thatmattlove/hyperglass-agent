@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width=300 src="https://github.com/checktheroads/hyperglass/blob/master/logo.png"/>
+<img width=300 src="https://res.cloudinary.com/hyperglass/image/upload/v1593389316/logo.png"/>
 
 <hr>
 
@@ -13,7 +13,7 @@
 
 # Installation
 
-### [Check out the docs](https://hyperglass.io/docs/agent)
+### [Check out the docs](https://hyperglass.io/docs/agent/installation)
 
 # License
 
