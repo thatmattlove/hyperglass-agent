@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from click import echo, style, prompt, confirm
 
 # Project
-from hyperglass_agent.cli.echo import info, error, success, warning
+from hyperglass_agent.cli.echo import info, error, label, success, warning
 from hyperglass_agent.cli.static import CL, NL, WS, WARNING, E
 
 
@@ -76,6 +76,7 @@ def migrate_config(force=False):
             f.write(data)
 
         success("Successfully migrated example config file to {t}", t=target_file)
+        label("Generated secret: {s}", s=gen_secret)
 
     try:
         if target_file.exists():
@@ -284,7 +285,7 @@ def install_systemd(service_path):
         {bool} -- True if successful
     """
     systemd = Path("/etc/systemd/system")
-    installed = systemd / "hyperglass-service.service"
+    installed = systemd / "hyperglass-agent.service"
 
     if not systemd.exists():
         error("{e} does not exist. Unable to install systemd service.", e=systemd)
