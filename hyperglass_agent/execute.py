@@ -43,7 +43,7 @@ async def run_query(query):
 
     target_formatter = target_format_map[params.mode].get(query.query_type)
 
-    if target_format_map is not None:
+    if target_formatter is not None:
         query.target = target_formatter(query.target)
 
     command_raw = operator.attrgetter(
