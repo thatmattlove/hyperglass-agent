@@ -1,27 +1,22 @@
 """Various formatting functions for supported platforms."""
 
-# Project
-from hyperglass_agent.nos_utils.bird import get_bird_version
 
-
-def format_bird(ip_version, cmd, mode):
+def format_bird(ip_version, bird_version, cmd):
     """Prefixes BIRD command with the appropriate BIRD CLI command.
 
     Arguments:
         ip_version {int} -- IPv4/IPv6
+        bird_version {int} -- BIRD version
         cmd {str} -- Unprefixed command
-        mode {str} -- Agent mode
 
     Returns:
         {str} -- Prefixed command
     """
-    if mode == "bird":
-        bird_version = get_bird_version()
-    else:
-        bird_version = 2
-    prefix_map = {1: {4: "birdc -r", 6: "birdc6 -r"}, 2: {4: "birdc -r", 6: "birdc -r"}}
+    cmd_prefix = "birdc"
 
-    cmd_prefix = prefix_map[bird_version][ip_version]
+    if bird_version == 1 and ip_version == 6:
+        cmd_prefix = "birdc6"
+
     command = f'{cmd_prefix} "{cmd}"'
 
     return command
