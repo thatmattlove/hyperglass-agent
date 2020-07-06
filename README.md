@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width=300 src="https://res.cloudinary.com/hyperglass/image/upload/v1593389316/logo.png"/>
+<img width=300 src="https://res.cloudinary.com/hyperglass/image/upload/v1593389316/logo-dark.svg"/>
 
 <hr>
 
@@ -13,7 +13,9 @@
 
 # Installation
 
-### [Check out the docs](https://hyperglass.io/docs/agent/installation)
+### 📚 [Check out the docs](https://hyperglass.io/docs/agent/installation)
+
+### 🛠 [Changelog](https://github.com/checktheroads/hyperglass-agent/blob/master/CHANGELOG.md)
 
 # License
 
