@@ -69,7 +69,7 @@ class Message:
         "success": "green",
         "error": "red",
         "info": "blue",
-        "status": "black",
+        "status": "white",
         "label": "white",
     }
     label_colors = {
@@ -77,7 +77,7 @@ class Message:
         "success": "green",
         "error": "red",
         "info": "blue",
-        "status": "black",
+        "status": "white",
         "label": "magenta",
     }
     emojis = {
