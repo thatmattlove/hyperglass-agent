@@ -51,4 +51,4 @@ set_app_path(required=False)
 __name__ = "hyperglass_agent"
 __title__ = "Hyperglass Agent"
 __description__ = "The Linux Routing Agent for hyperglass"
-__version__ = "0.1.0"
+__version__ = "0.1.6"
