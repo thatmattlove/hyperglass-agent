@@ -5,6 +5,7 @@ import sys
 import platform
 from pathlib import Path
 from datetime import datetime, timedelta
+from functools import wraps
 
 # Third Party
 from click import group, style, option, confirm, help_option
@@ -41,6 +42,20 @@ def _print_version(ctx, param, value):
     ctx.exit()
 
 
+def catch(func):
+    """Catch any unhandled exceptions."""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            val = func(*args, **kwargs)
+        except BaseException as err:
+            error(err)
+        return val
+
+    return wrapper
+
+
 @group(
     help="hyperglass agent CLI",
     context_settings={"help_option_names": ["-h", "--help"], "color": supports_color},
@@ -62,6 +77,7 @@ def cli():
 
 @cli.command("secret", help="Generate Agent Secret")
 @option("-l", "--length", default=32, help="Character Length")
+@catch
 def generate_secret(length):
     """Generate a secret for JWT encoding.
 
@@ -99,6 +115,7 @@ def generate_secret(length):
 )
 @option("-v", "--view-key", "show", is_flag=True, help="Show Private Key in CLI Output")
 @option("--get", is_flag=True, help="Get existing public key")
+@catch
 def gen_cert(name, org, duration, size, show, get):
     """Generate SSL certificate keypair.
 
@@ -131,6 +148,7 @@ def gen_cert(name, org, duration, size, show, get):
 
 
 @cli.command("send-certificate", help="Send this device's public key to hyperglass")
+@catch
 def send_certificate():
     """Send this device's public key to hyperglass."""
     from hyperglass_agent.cli.actions import send_cert
@@ -178,6 +196,7 @@ def start_server():
 @option(
     "--force", is_flag=True, default=False, help="Force regeneration of config file"
 )
+@catch
 def run_setup(config, certs, systemd, send, force):
     """Run setup wizard.
 

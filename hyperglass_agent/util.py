@@ -1,7 +1,9 @@
-"""Agent utility fuctions."""
+"""Agent utility functions."""
 
 # Standard Library
 import os
+import re
+from typing import Generator
 
 # Project
 from hyperglass_agent.constants import APP_PATHS
@@ -133,3 +135,22 @@ def send_public_key(hyperglass_url, device_name, certificate, params):
         if response.status_code != 200:
             raise RuntimeError(response.text)
         return response.text
+
+
+def get_addresses() -> Generator:
+    """Get IPv4/IPv6 addresses associated with each interface."""
+    import psutil
+    from ipaddress import ip_address
+
+    interfaces = psutil.net_if_addrs()
+
+    for iface, addrs in interfaces.items():
+        for addr in addrs:
+            if addr.family.numerator in (2, 30):
+                try:
+                    re.sub
+                    ip = ip_address(addr.address.split("%")[0])
+                    if not any((ip.is_link_local, ip.is_multicast, ip.is_loopback)):
+                        yield iface, ip
+                except ValueError:
+                    pass

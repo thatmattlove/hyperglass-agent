@@ -2,14 +2,27 @@
 
 # Standard Library
 import os
+from typing import Iterable, Generator
 from pathlib import Path
 from datetime import datetime, timedelta
+from ipaddress import ip_address
 
 # Third Party
 from click import echo, style, prompt, confirm
+from inquirer import List as InquirerList
+from inquirer import Checkbox
 
 # Project
-from hyperglass_agent.cli.echo import info, error, label, success, warning
+from hyperglass_agent.util import get_addresses
+from hyperglass_agent.cli.echo import (
+    info,
+    error,
+    label,
+    status,
+    inquire,
+    success,
+    warning,
+)
 from hyperglass_agent.cli.static import CL, NL, WS, WARNING, E
 
 
@@ -94,7 +107,6 @@ def migrate_config(force=False):
 def find_app_path():
     """Try to find the app_path, prompt user to set one if it is not found."""
     import os
-    import inquirer
     from hyperglass_agent.util import set_app_path
     from hyperglass_agent.constants import APP_PATHS
 
@@ -116,13 +128,13 @@ def find_app_path():
             )
         elif create:
             available_paths = [
-                inquirer.List(
+                InquirerList(
                     "selected",
                     message="Choose a directory for hyperglass-agent",
                     choices=APP_PATHS,
                 )
             ]
-            answer = inquirer.prompt(available_paths)
+            answer = inquire(available_paths)
             if answer is None:
                 error("A directory for hyperglass-agent is required")
             selected = answer["selected"]
@@ -135,7 +147,29 @@ def find_app_path():
     return app_path
 
 
-def make_cert(cn, o, start, end, size):
+def read_cert():
+    """Read public key attributes."""
+    from cryptography import x509
+    from cryptography.x509.oid import NameOID
+    from cryptography.x509.extensions import ExtensionOID
+    from cryptography.hazmat.backends import default_backend
+
+    app_path = find_app_path()
+    cert_path = app_path / "agent_cert.pem"
+
+    cert = x509.load_pem_x509_certificate(cert_path.read_bytes(), default_backend())
+
+    for attr in cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME):
+        yield attr.value
+    for attr in cert.extensions.get_extension_for_oid(
+        ExtensionOID.SUBJECT_ALTERNATIVE_NAME
+    ).value._general_names:
+        yield attr.value
+
+
+def make_cert(
+    cn: str, sans: Iterable, o: str, start: datetime, end: datetime, size: int = 2048
+) -> Generator:
     """Generate public & private key pair for SSL."""
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
@@ -145,7 +179,7 @@ def make_cert(cn, o, start, end, size):
     from cryptography.hazmat.primitives import hashes
 
     key = rsa.generate_private_key(
-        public_exponent=65537, key_size=2048, backend=default_backend()
+        public_exponent=65537, key_size=size, backend=default_backend()
     )
     subject = issuer = x509.Name(
         [
@@ -161,16 +195,20 @@ def make_cert(cn, o, start, end, size):
         .serial_number(x509.random_serial_number())
         .not_valid_before(start)
         .not_valid_after(end)
-        .add_extension(x509.SubjectAlternativeName([x509.DNSName(cn)]), critical=False)
+        .add_extension(
+            x509.SubjectAlternativeName(
+                [x509.DNSName(cn), *(x509.IPAddress(i) for i in sans)]
+            ),
+            critical=False,
+        )
         .sign(key, hashes.SHA256(), default_backend())
     )
-    cert = cert.public_bytes(serialization.Encoding.PEM)
-    key = key.private_bytes(
+    yield cert.public_bytes(serialization.Encoding.PEM)
+    yield key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
         encryption_algorithm=serialization.NoEncryption(),
     )
-    return (cert, key)
 
 
 def write_cert(name, org, duration, size, show):
@@ -190,8 +228,35 @@ def write_cert(name, org, duration, size, show):
     start = datetime.now()
     end = start + timedelta(days=duration * 365)
 
-    cert, key = make_cert(cn=name, o=org, start=start, end=end, size=size)
+    label("Hostname: {cn}", cn=name)
+    status(
+        """
+A self-signed certificate with the above hostname as the common name
+attribute will be generated. This hostname must be resolvable by
+hyperglass via either DNS or a host file, and must match the device's
+`address:` field in hyperglass's devices.yaml."""
+    )
+    use_name = confirm("Is this the correct hostname?", default=True)
 
+    if not use_name:
+        name = prompt("Please enter the correct hostname", type=str)
+
+    all_ips = [f"{a} [{i}]" for i, a in get_addresses()]
+
+    status(
+        """
+hyperglass-agent adds any IP addresses reachable by hyperglass as
+subject alternative names to the SSL certificate. Please select any IP
+addresses over which hyperglass may communicate with hyperglass-agent."""
+    )
+
+    ips = [Checkbox("ips", message="Select IPs", choices=all_ips)]
+    selected = [i.split("[")[0].strip() for i in inquire(ips)["ips"]]
+    selected_ips = [ip_address(i) for i in selected]
+
+    cert, key = make_cert(
+        cn=name, sans=selected_ips, o=org, start=start, end=end, size=size
+    )
     if show:
         info(f'Public Key:\n{cert.decode("utf8")}')
         info(f'Private Key:\n{key.decode("utf8")}')
@@ -216,13 +281,14 @@ def write_cert(name, org, duration, size, show):
 def send_cert():
     """Send this device's public key to hyperglass."""
 
-    import platform
     from hyperglass_agent.config import params
     from hyperglass_agent.util import send_public_key
     from pydantic import AnyHttpUrl, create_model, ValidationError
 
     app_path = find_app_path()
     cert_file = app_path / "agent_cert.pem"
+
+    device_name = read_cert().send(None)
 
     if params.ssl is not None and not params.ssl.enable:
         confirm(
@@ -252,15 +318,6 @@ def send_cert():
         except ValidationError as ve:
             msg = ve.errors()[0]["msg"]
             error("URL {u} is invalid: {e}", u=_hg_url, e=msg)
-
-    device_name = platform.node()
-    keep_discovered = confirm(
-        f"This device's hostname appears to be '{device_name}'. "
-        + "Does this match this device's definition in hyperglass?"
-    )
-
-    if not keep_discovered:
-        device_name = prompt("Enter the device's name as configured in hyperglass")
 
     try:
         status = send_public_key(
