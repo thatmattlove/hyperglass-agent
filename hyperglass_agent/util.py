@@ -154,3 +154,25 @@ def get_addresses() -> Generator:
                         yield iface, ip
                 except ValueError:
                     pass
+
+
+def color_support() -> Generator:
+    """Determine if the terminal supports color."""
+    import sys
+    import shutil
+    import subprocess  # noqa: S404
+
+    supported_platform = sys.platform != "win32" or "ANSICON" in os.environ
+    is_a_tty = hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
+
+    color = supported_platform and is_a_tty
+    yield color
+
+    has_tput = shutil.which("tput")
+    num_colors = ""
+
+    if color and has_tput:
+        num_colors = (
+            subprocess.check_output([has_tput, "colors"]).decode().strip()  # noqa: S603
+        )
+    yield num_colors

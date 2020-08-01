@@ -1,26 +1,43 @@
 """Helper functions for CLI message printing."""
 # Standard Library
 import re
-import sys
 
 # Third Party
 from click import echo, style
 from inquirer import prompt
-from inquirer.themes import Default, load_theme_from_dict
+from inquirer.themes import load_theme_from_dict
 
 # Project
+from hyperglass_agent.util import color_support
 from hyperglass_agent.cli.static import Message
 from hyperglass_agent.cli.exceptions import CliError
-
-supports_color = "utf" in sys.getfilesystemencoding().lower()
 
 
 def inquire(questions):
     """Run inquire.prompt() with a theme if supported."""
-    theme = Default
+    theme = None
+
+    supports_color, num_colors = color_support()
+
     if supports_color:
-        theme = load_theme_from_dict(
-            {
+        color_themes = {
+            "8": {
+                "Question": {"mark_color": "green", "brackets_color": "green"},
+                "List": {
+                    "selection_color": "green",
+                    "selection_cursor": ">",
+                    "unselected_color": "white",
+                },
+                "Checkbox": {
+                    "selection_color": "blue",
+                    "selected_color": "green",
+                    "selection_icon": ">",
+                    "selected_icon": "X",
+                    "unselected_icon": "O",
+                    "unselected_color": "white",
+                },
+            },
+            "256": {
                 "Question": {"mark_color": "bright_green", "brackets_color": "green"},
                 "List": {
                     "selection_color": "bold_green",
@@ -35,8 +52,11 @@ def inquire(questions):
                     "unselected_icon": "◯",
                     "unselected_color": "white",
                 },
-            }
-        )
+            },
+        }
+        color_theme = color_themes.get(num_colors)
+        if color_theme is not None:
+            theme = load_theme_from_dict(color_theme)
 
     return prompt(questions, theme=theme)
 
