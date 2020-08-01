@@ -2,7 +2,8 @@
 
 # Standard Library
 import os
-from typing import Iterable, Generator
+import shutil
+from typing import Any, Iterable, Optional, Generator
 from pathlib import Path
 from datetime import datetime, timedelta
 from ipaddress import ip_address
@@ -26,7 +27,7 @@ from hyperglass_agent.cli.echo import (
 from hyperglass_agent.cli.static import CL, NL, WS, WARNING, E
 
 
-def create_dir(path, **kwargs):
+def create_dir(path: Any, **kwargs: Any) -> bool:
     """Validate and attempt to create a directory, if it does not exist."""
 
     # If input path is not a path object, try to make it one
@@ -58,11 +59,32 @@ def create_dir(path, **kwargs):
     return True
 
 
-def migrate_config(force=False):
-    """Copy example config file and remove .example extensions."""
-    import os
-    import shutil
+def generate_secret(length: int = 32) -> str:
+    """Generate a secret for JWT encoding."""
     import secrets
+
+    gen_secret = secrets.token_urlsafe(length)
+    status(
+        """
+This secret will be used to encrypt & decrypt the communication between
+hyperglass and hyperglass-agent. Before proceeding any further, please
+add the secret to the `password:` field of the device's configuration in
+hyperglass's devices.yaml file, and restart hyperglass.
+    """
+    )
+    label("Secret: {s}", s=gen_secret)
+    done = confirm(
+        "Press enter once complete...",
+        default=True,
+        prompt_suffix="",
+        show_default=False,
+    )
+    if done:  # noqa: R503
+        return gen_secret
+
+
+def migrate_config(force: bool = False, secret: Optional[str] = None) -> None:
+    """Copy example config file and remove .example extensions."""
 
     app_path = os.environ.get("hyperglass_agent_directory")
 
@@ -74,7 +96,7 @@ def migrate_config(force=False):
     example = Path(__file__).parent.parent / "example_config.yaml"
     target_file = app_path / "config.yaml"
 
-    def copy():
+    def copy(secret):
         shutil.copyfile(example, target_file)
         if not target_file.exists():
             raise FileNotFoundError(str(target_file) + "does not exist.")
@@ -82,31 +104,31 @@ def migrate_config(force=False):
         with target_file.open("r") as f:
             data = f.read()
 
-        gen_secret = secrets.token_urlsafe(32)
-        data = data.replace("secret: null", "secret: '{}'".format(gen_secret))
+        if secret is None:
+            secret = generate_secret()
+
+        data = data.replace("secret: null", "secret: '{}'".format(secret))
 
         with target_file.open("w") as f:
             f.write(data)
 
         success("Successfully migrated example config file to {t}", t=target_file)
-        label("Generated secret: {s}", s=gen_secret)
 
     try:
         if target_file.exists():
             if not force:
                 info("{f} already exists", f=str(target_file))
             else:
-                copy()
+                copy(secret)
         else:
-            copy()
+            copy(secret)
 
     except Exception as e:
         error("Failed to migrate '{f}': {e}", f=str(target_file), e=e)
 
 
-def find_app_path():
+def find_app_path() -> Path:
     """Try to find the app_path, prompt user to set one if it is not found."""
-    import os
     from hyperglass_agent.util import set_app_path
     from hyperglass_agent.constants import APP_PATHS
 
@@ -147,7 +169,7 @@ def find_app_path():
     return app_path
 
 
-def read_cert():
+def read_cert() -> Generator:
     """Read public key attributes."""
     from cryptography import x509
     from cryptography.x509.oid import NameOID
@@ -211,16 +233,8 @@ def make_cert(
     )
 
 
-def write_cert(name, org, duration, size, show):
-    """Generate SSL certificate keypair.
-
-    Arguments:
-        name {str} -- Common Name
-        org {str} -- Organization
-        duration -- Validity in years
-        size {int} -- Key Size
-        show {bool} -- Show private key in CLI
-    """
+def write_cert(name: str, org: str, duration: int, size: int, show: bool) -> None:
+    """Generate SSL certificate keypair."""
     app_path = find_app_path()
     cert_path = app_path / "agent_cert.pem"
     key_path = app_path / "agent_key.pem"
@@ -278,7 +292,7 @@ addresses over which hyperglass may communicate with hyperglass-agent."""
     success("Wrote private key to: {f}", f=key_path.absolute())
 
 
-def send_cert():
+def send_certificate() -> None:
     """Send this device's public key to hyperglass."""
 
     from hyperglass_agent.config import params
@@ -328,19 +342,8 @@ def send_cert():
         error(str(re))
 
 
-def install_systemd(service_path):
-    """Installs generated systemd file to system's systemd directory.
-
-    Arguments:
-        app_path {Path} -- hyperglass runtime path
-
-    Raises:
-        ClickException: Raised if the /etc/systemd/system does not exist
-        ClickException: Raised if the symlinked file does not exit
-
-    Returns:
-        {bool} -- True if successful
-    """
+def install_systemd(service_path: Path) -> bool:
+    """Installs generated systemd file to system's systemd directory."""
     systemd = Path("/etc/systemd/system")
     installed = systemd / "hyperglass-agent.service"
 
@@ -359,15 +362,8 @@ def install_systemd(service_path):
     return True
 
 
-def make_systemd():
-    """Generate a systemd file based on the local system.
-
-    Arguments:
-        user {str} -- User hyperglass-agent needs to be run as
-
-    Returns:
-        {str} -- Generated systemd template
-    """
+def make_systemd() -> bool:
+    """Generate a systemd file based on the local system."""
     from shutil import which
     from getpass import getuser
 
@@ -417,7 +413,7 @@ WantedBy=multi-user.target
     return True
 
 
-def start_web_server():
+def start_web_server() -> None:
     """Start web server."""
 
     find_app_path()

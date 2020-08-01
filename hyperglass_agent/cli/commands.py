@@ -1,7 +1,6 @@
 """hyperglass-agent CLI commands."""
 
 # Standard Library
-import sys
 import platform
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -11,6 +10,7 @@ from functools import wraps
 from click import group, style, option, confirm, help_option
 
 # Project
+from hyperglass_agent.util import color_support
 from hyperglass_agent.cli.echo import error, label, warning
 from hyperglass_agent.cli.static import WARNING
 
@@ -30,7 +30,7 @@ DEFAULT_CERT_SIZE = 4096
 DEFAULT_CERT_DURATION = 2
 DEFAULT_CERT_SHOW = False
 
-supports_color = "utf" in sys.getfilesystemencoding().lower()
+supports_color, _ = color_support()
 
 
 def _print_version(ctx, param, value):
@@ -78,19 +78,14 @@ def cli():
 @cli.command("secret", help="Generate Agent Secret")
 @option("-l", "--length", default=32, help="Character Length")
 @catch
-def generate_secret(length):
-    """Generate a secret for JWT encoding.
+def _generate_secret(length):
+    """Generate a secret for JWT encoding."""
+    from hyperglass_agent.cli.actions import generate_secret
 
-    Arguments:
-        length {int} -- Secret character length
-    """
-    import secrets
-
-    gen_secret = secrets.token_urlsafe(length)
-    label("Secret: {s}", s=gen_secret)
+    generate_secret(length)
 
 
-@cli.command("cert", help="Generate SSL Certificate Key Pair")
+@cli.command("certificate", help="Generate SSL Certificate Key Pair")
 @option(
     "-cn",
     "--name",
@@ -116,16 +111,10 @@ def generate_secret(length):
 @option("-v", "--view-key", "show", is_flag=True, help="Show Private Key in CLI Output")
 @option("--get", is_flag=True, help="Get existing public key")
 @catch
-def gen_cert(name, org, duration, size, show, get):
-    """Generate SSL certificate keypair.
-
-    Arguments:
-        name {str} -- Common Name
-        org {str} -- Organization
-        duration -- Validity in years
-        size {int} -- Key Size
-        show {bool} -- Show private key in CLI
-    """
+def _generate_cert(
+    name: str, org: str, duration: int, size: int, show: bool, get: bool
+):
+    """Generate SSL certificate keypair."""
     from hyperglass_agent.cli.actions import write_cert, find_app_path
 
     if get:
@@ -149,15 +138,15 @@ def gen_cert(name, org, duration, size, show, get):
 
 @cli.command("send-certificate", help="Send this device's public key to hyperglass")
 @catch
-def send_certificate():
+def _send_certificate():
     """Send this device's public key to hyperglass."""
-    from hyperglass_agent.cli.actions import send_cert
+    from hyperglass_agent.cli.actions import send_certificate
 
-    send_cert()
+    send_certificate()
 
 
 @cli.command("start", help="Start the Web Server")
-def start_server():
+def _start_web_server():
     """Start the hyperglass agent."""
     from hyperglass_agent.cli.actions import start_web_server
 
@@ -197,7 +186,7 @@ def start_server():
     "--force", is_flag=True, default=False, help="Force regeneration of config file"
 )
 @catch
-def run_setup(config, certs, systemd, send, force):
+def _run_setup(config, certs, systemd, send, force):
     """Run setup wizard.
 
     Checks/creates installation directory, generates and writes
@@ -208,10 +197,13 @@ def run_setup(config, certs, systemd, send, force):
         migrate_config,
         write_cert,
         make_systemd,
-        send_cert,
+        send_certificate,
+        generate_secret,
     )
 
     find_app_path()
+
+    secret = generate_secret()
 
     if not certs:
         write_cert(
@@ -223,10 +215,10 @@ def run_setup(config, certs, systemd, send, force):
         )
 
     if not config:
-        migrate_config(force)
+        migrate_config(force=force, secret=secret)
 
     if not systemd:
         make_systemd()
 
     if not send:
-        send_cert()
+        send_certificate()
