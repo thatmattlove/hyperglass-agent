@@ -233,13 +233,13 @@ def make_cert(
     )
 
 
-def write_cert(name: str, org: str, duration: int, size: int, show: bool) -> None:
+def write_cert(name: str, org: str, duration: int, starttime: str, size: int, show: bool) -> None:
     """Generate SSL certificate keypair."""
     app_path = find_app_path()
     cert_path = app_path / "agent_cert.pem"
     key_path = app_path / "agent_key.pem"
 
-    start = datetime.now()
+    start = starttime
     end = start + timedelta(days=duration * 365)
 
     label("Hostname: {cn}", cn=name)
