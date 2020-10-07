@@ -20,7 +20,8 @@ MODULE_DIR = WORKING_DIR / "hyperglass_agent"
 
 # Certificate parameters
 CERT_START = datetime.utcnow()
-CERT_END = datetime.utcnow() + timedelta(days=730)
+#CERT_END = datetime.utcnow() + timedelta(days=730)
+
 CERT_FILE = MODULE_DIR / "agent_cert.pem"
 KEY_FILE = MODULE_DIR / "agent_key.pem"
 
@@ -126,14 +127,14 @@ def _generate_cert(
             if not do_gen:
                 error("Certificate & key files do not yet exist.")
             else:
-                write_cert(name=name, org=org, duration=duration, size=size, show=show)
+                write_cert(name=name, org=org, duration=duration, starttime=CERT_START, size=size, show=show)
         else:
             with cert_path.open("r") as f:
                 cert = f.read()
 
             label(f"Public Key:\n\n{cert}")
     else:
-        write_cert(name=name, org=org, duration=duration, size=size, show=show)
+        write_cert(name=name, org=org, duration=duration, starttime=CERT_START, size=size, show=show)
 
 
 @cli.command("send-certificate", help="Send this device's public key to hyperglass")
