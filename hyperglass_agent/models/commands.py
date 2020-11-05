@@ -148,6 +148,13 @@ class BIRD(HyperglassModel):
     ipv6_vpn: VPNIPv6 = VPNIPv6(ip_version=6, bird_version=bird_version)
 
 
+def rsetattr_nested(base, key, val):
+    if isinstance(val, dict):
+        for nkey, nval in val.items():
+            rsetattr_nested(getattr(base, key), nkey, nval)
+    else:
+        setattr(base, key, val)
+
 class Commands(HyperglassModel):
     """Base class for all commands."""
 
@@ -173,7 +180,7 @@ class Commands(HyperglassModel):
 
         if input_params is not None:
             for (nos, cmds) in input_params.items():
-                setattr(Commands, nos, Command(**cmd_kwargs, **cmds))
+                rsetattr_nested(obj, nos, cmds)
         return obj
 
     bird: BIRD = BIRD()

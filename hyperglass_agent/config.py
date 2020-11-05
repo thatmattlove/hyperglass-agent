@@ -61,7 +61,7 @@ try:
     _user_config = General(**_raw_config)
 
     if _commands is not None:
-        _user_commands = Commands.import_params(mode=_user_config.mode, **_commands)
+        _user_commands = Commands.import_params(mode=_user_config.mode, input_params=_commands)
     else:
         _user_commands = Commands.import_params(mode=_user_config.mode)
 
