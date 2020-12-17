@@ -80,9 +80,11 @@ async def parse_bird_output(raw, query_data, not_found):
         notfound_message = not_found.format(
             target=query_data.target, afi=AFI_DISPLAY_MAP[query_data.afi]
         )
-        return notfound_message
+        ret = notfound_message
     else:
-        return '\n'.join(output)
+        ret = output
+
+    return '\n'.join(ret)
 
 
 def format_bird_bgp_community(target):
