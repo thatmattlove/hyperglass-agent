@@ -82,7 +82,7 @@ async def parse_bird_output(raw, query_data, not_found):
         )
         return notfound_message
     else:
-        return output
+        return '\n'.join(output)
 
 
 def format_bird_bgp_community(target):
