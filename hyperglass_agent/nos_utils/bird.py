@@ -69,23 +69,20 @@ async def parse_bird_output(raw, query_data, not_found):
     """
 
     def remove_ready(lines):
-        for line in lines:
+        for line in lines.splitlines():
             if not re.match(r".*(BIRD \d+\.\d+\.?\d* ready\.).*", line):
-                yield line.strip()
+                yield line
 
-    raw_split = re.split(r"(Table)", raw.strip())
+    output = remove_ready(raw)
+    log.debug(f"Parsed output:\n{output}")
 
-    if not raw_split:
+    if not output:
         notfound_message = not_found.format(
             target=query_data.target, afi=AFI_DISPLAY_MAP[query_data.afi]
         )
-        lines = notfound_message
+        return notfound_message
     else:
-        lines = raw_split
-
-    output = "\n".join(remove_ready(lines))
-    log.debug(f"Parsed output:\n{output}")
-    return output
+        return output
 
 
 def format_bird_bgp_community(target):
